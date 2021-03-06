@@ -32,7 +32,7 @@ let tests =
             |> Console.WriteLine
         }
         testAsync "Embed Microsoft apt source and key" {
-            // curl -sSL https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
+            // curl -sSL https://packages.microsoft.com/config/ubuntu/18.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
             let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/18.04/prod.list" |> Async.AwaitTask
             let! aptSource = aptSourceRes.Content.ReadAsStringAsync () |> Async.AwaitTask
             // curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
@@ -41,12 +41,14 @@ let tests =
             {
                 CloudConfig.Default with
                     Apt =
-                        let apt = Apt()
-                        apt.Sources <-
-                            [
-                                "microsoft-prod", { AptSource.Default with Key = gpgKey; Source = aptSource}
-                            ] |> dict
-                        apt
+                        Apt (
+                            Sources =
+                                (
+                                    [
+                                        "microsoft-prod", { AptSource.Default with Key = gpgKey; Source = aptSource}
+                                    ] |> dict
+                                )
+                            )
                     PackageUpdate = Nullable true
                     Packages = ["apt-transport-https"; "dotnet-sdk-5.0"]
             }
