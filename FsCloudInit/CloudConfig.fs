@@ -3,12 +3,6 @@
 open System
 open System.Collections.Generic
 
-type CloudConfigSection =
-    | Packages of string list
-    | PackageUpdate of bool
-    | PackageUpgrade of bool
-    | PackageRebootIfRequired of bool
-
 module FileEncoding =
      [<Literal>]
      let Base64 = "b64"
