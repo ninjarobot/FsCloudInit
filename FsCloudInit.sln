@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FsCloudInit", "FsCloudInit\FsCloudInit.fsproj", "{0329C3DF-6B5E-4488-B0B8-921A013CE90F}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FsCloudInitTests", "FsCloudInitTests\FsCloudInitTests.fsproj", "{DA0A8D5A-D5C4-42A6-9108-22D2CB6FB8C7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0329C3DF-6B5E-4488-B0B8-921A013CE90F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0329C3DF-6B5E-4488-B0B8-921A013CE90F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0329C3DF-6B5E-4488-B0B8-921A013CE90F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0329C3DF-6B5E-4488-B0B8-921A013CE90F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA0A8D5A-D5C4-42A6-9108-22D2CB6FB8C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA0A8D5A-D5C4-42A6-9108-22D2CB6FB8C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA0A8D5A-D5C4-42A6-9108-22D2CB6FB8C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA0A8D5A-D5C4-42A6-9108-22D2CB6FB8C7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
