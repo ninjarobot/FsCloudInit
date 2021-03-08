@@ -11,4 +11,4 @@ module Writer =
                 .WithNamingConvention(YamlDotNet.Serialization.NamingConventions.UnderscoredNamingConvention.Instance)
                 .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults)
                 .Build()
-        String.Concat ("#cloud-config", Environment.NewLine, serializer.Serialize config)
+        String.Concat ("#cloud-config", Environment.NewLine, serializer.Serialize config.ConfigModel)

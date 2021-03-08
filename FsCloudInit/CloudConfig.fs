@@ -40,22 +40,42 @@ type AptSource =
 type Apt() =
     member val Sources = Unchecked.defaultof<IDictionary<string, AptSource>> with get, set
 
+type Package =
+    | Package of string
+    | PackageVersion of PackageName:string * PackageVersion:string
+    member this.Model =
+        match this with
+        | Package p -> box p
+        | PackageVersion (name, ver) -> [ name; ver] |> ResizeArray |> box
+
 type CloudConfig =
     {
-        Apt : Apt
-        Packages : string seq
-        PackageUpdate : Nullable<bool>
-        PackageUpgrade : Nullable<bool>
-        PackageRebootIfRequired : Nullable<bool>
+        Apt : Apt option
+        Packages : Package seq
+        PackageUpdate : bool option
+        PackageUpgrade : bool option
+        PackageRebootIfRequired : bool option
         WriteFiles : WriteFile seq
     }
     static member Default =
         {
-            Apt = Unchecked.defaultof<Apt>
-            Packages = null
-            PackageUpdate = Nullable()
-            PackageUpgrade = Nullable()
-            PackageRebootIfRequired = Nullable()
-            WriteFiles = null
+            Apt = None
+            Packages = []
+            PackageUpdate = None
+            PackageUpgrade = None
+            PackageRebootIfRequired = None
+            WriteFiles = []
         }
+    member this.ConfigModel =
+        {|
+            Apt = this.Apt |> Option.defaultValue Unchecked.defaultof<Apt>
+            Packages =
+                if this.Packages |> Seq.isEmpty then null
+                else this.Packages |> Seq.map (fun p -> p.Model)
+            PackageUpdate = this.PackageUpdate |> Option.toNullable
+            PackageUpgrade = this.PackageUpgrade |> Option.toNullable
+            WriteFiles =
+                if this.WriteFiles |> Seq.isEmpty then null
+                else this.WriteFiles
+        |}
     
