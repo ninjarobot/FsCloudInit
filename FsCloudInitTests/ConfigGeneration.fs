@@ -48,12 +48,10 @@ let tests =
                     Apt =
                         Apt (
                             Sources =
-                                (
-                                    [
-                                        "microsoft-prod", { AptSource.Default with Key = gpgKey; Source = aptSource}
-                                    ] |> dict
-                                )
-                            ) |> Some
+                                dict  [
+                                    "microsoft-prod", { AptSource.Default with Key = gpgKey; Source = aptSource}
+                                ]
+                        ) |> Some
                     PackageUpdate = Some true
                     Packages = [Package "apt-transport-https"; Package "dotnet-sdk-5.0"]
             }
@@ -70,16 +68,14 @@ let tests =
                     Apt =
                         Apt (
                             Sources =
-                                (
-                                    [
-                                        "microsoft-prod", { AptSource.Default with Key = gpgKey; Source = aptSource}
-                                    ] |> dict
-                                )
-                            ) |> Some
+                                dict [
+                                    "microsoft-prod", { AptSource.Default with Key = gpgKey; Source = aptSource}
+                                ]
+                        ) |> Some
                     PackageUpdate = Some true
                     Packages = [
                         Package "apt-transport-https"
-                        PackageVersion(PackageName="dotnet-sdk-5.0", PackageVersion="5.0.103-1")
+                        PackageVersion (PackageName="dotnet-sdk-5.0", PackageVersion="5.0.103-1")
                     ]
             }
             |> Writer.write

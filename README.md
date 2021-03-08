@@ -19,14 +19,17 @@ async {
     {
         CloudConfig.Default with
             Apt =
-                let apt = Apt()
-                apt.Sources <-
-                    [
-                        "microsoft-prod", { AptSource.Default with Key = gpgKey; Source = aptSource}
-                    ] |> dict
-                apt
-            PackageUpdate = Nullable true
-            Packages = ["apt-transport-https"; "dotnet-sdk-5.0"]
+                Apt (
+                    Sources =
+                        dict [
+                            "microsoft-prod", { AptSource.Default with Key = gpgKey; Source = aptSource}
+                        ]
+                ) |> Some
+            PackageUpdate = Some true
+            Packages = [
+                Package "apt-transport-https"
+                PackageVersion (PackageName="dotnet-sdk-5.0", PackageVersion="5.0.103-1")
+            ]
     }
     |> Writer.write
     |> Console.WriteLine
