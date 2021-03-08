@@ -1,10 +1,15 @@
 module Tests
 
 open System
+open System.IO
 open FsCloudInit
 open Expecto
 
 let http = new System.Net.Http.HttpClient()
+
+let matchExpectedAt (expectedContentFile:string) (generatedConfig:string) =
+    let expected = File.ReadAllText $"TestContent/{expectedContentFile}"
+    Expect.equal (generatedConfig.Trim()) (expected.Trim()) $"Did not match expected config at TestContent/{expectedContentFile}"
 
 [<Tests>]
 let tests =
@@ -12,7 +17,7 @@ let tests =
         test "Generates empty cloud config" {
             CloudConfig.Default
             |> Writer.write
-            |> Console.WriteLine
+            |> matchExpectedAt "empty-config.yaml"
         }
         test "Generates basic cloud config" {
             {
@@ -20,7 +25,7 @@ let tests =
                     PackageUpgrade = Some true
             }
             |> Writer.write
-            |> Console.WriteLine
+            |> matchExpectedAt "package-upgrade.yaml"
         }
         test "Generates with packages to install" {
             {
@@ -29,7 +34,7 @@ let tests =
                     PackageUpgrade = Some true
             }
             |> Writer.write
-            |> Console.WriteLine
+            |> matchExpectedAt "package-install.yaml"
         }
         testAsync "Embed Microsoft apt source and key" {
             // curl -sSL https://packages.microsoft.com/config/ubuntu/18.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
@@ -53,7 +58,7 @@ let tests =
                     Packages = [Package "apt-transport-https"; Package "dotnet-sdk-5.0"]
             }
             |> Writer.write
-            |> Console.WriteLine
+            |> matchExpectedAt "apt-source.yaml"
         }
         testAsync "Install specific dotnet SDK version" {
             let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/18.04/prod.list" |> Async.AwaitTask
@@ -78,9 +83,9 @@ let tests =
                     ]
             }
             |> Writer.write
-            |> Console.WriteLine
+            |> matchExpectedAt "package-specific.yaml" 
         }
-        test "Embed file " {
+        test "Embed file" {
             let content = "hello world"
             {
                 CloudConfig.Default with
@@ -94,6 +99,6 @@ let tests =
                     ]
             }
             |> Writer.write
-            |> Console.WriteLine
+            |> matchExpectedAt "file-embedding.yaml"
         }
     ]

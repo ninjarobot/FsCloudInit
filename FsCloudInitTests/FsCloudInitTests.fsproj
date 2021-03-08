@@ -9,6 +9,7 @@
     <ItemGroup>
         <Compile Include="ConfigGeneration.fs" />
         <Compile Include="Main.fs" />
+        <Content Include="TestContent\package-specific.yaml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -18,6 +19,10 @@
         <PackageReference Update="FSharp.Core" Version="5.*" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="$(ProjectDir)TestContent\**" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+    
     <ItemGroup>
       <ProjectReference Include="..\FsCloudInit\FsCloudInit.fsproj" />
     </ItemGroup>
