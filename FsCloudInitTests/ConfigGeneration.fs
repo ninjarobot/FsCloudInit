@@ -110,4 +110,12 @@ let tests =
             |> Writer.write
             |> matchExpectedAt "run-command.yaml"
         }
+        test "Print a final message" {
+            {
+                CloudConfig.Default with
+                    FinalMessage = Some "#### Cloud-init is done! ####"
+            }
+            |> Writer.write
+            |> matchExpectedAt "final-message.yaml"
+        }
     ]

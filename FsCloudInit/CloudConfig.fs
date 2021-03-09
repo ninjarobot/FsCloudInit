@@ -59,6 +59,7 @@ type RunCmd =
 type CloudConfig =
     {
         Apt : Apt option
+        FinalMessage : string option
         Packages : Package seq
         PackageUpdate : bool option
         PackageUpgrade : bool option
@@ -69,6 +70,7 @@ type CloudConfig =
     static member Default =
         {
             Apt = None
+            FinalMessage = None
             Packages = []
             PackageUpdate = None
             PackageUpgrade = None
@@ -79,6 +81,7 @@ type CloudConfig =
     member this.ConfigModel =
         {|
             Apt = this.Apt |> Option.defaultValue Unchecked.defaultof<Apt>
+            FinalMessage = this.FinalMessage |> Option.toObj
             Packages =
                 if this.Packages |> Seq.isEmpty then null
                 else this.Packages |> Seq.map (fun p -> p.Model)

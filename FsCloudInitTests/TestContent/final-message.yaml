@@ -1,0 +1,2 @@
+#cloud-config
+final_message: '#### Cloud-init is done! ####'
