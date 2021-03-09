@@ -48,6 +48,14 @@ type Package =
         | Package p -> box p
         | PackageVersion (name, ver) -> [ name; ver] |> ResizeArray |> box
 
+type Cmd = string list
+type RunCmd =
+    | RunCmd of Cmd list
+    member this.Model : string seq seq =
+        match this with
+        | RunCmd (commands) ->
+            commands |> Seq.map Seq.ofList
+
 type CloudConfig =
     {
         Apt : Apt option
@@ -55,6 +63,7 @@ type CloudConfig =
         PackageUpdate : bool option
         PackageUpgrade : bool option
         PackageRebootIfRequired : bool option
+        RunCmd : RunCmd option
         WriteFiles : WriteFile seq
     }
     static member Default =
@@ -64,6 +73,7 @@ type CloudConfig =
             PackageUpdate = None
             PackageUpgrade = None
             PackageRebootIfRequired = None
+            RunCmd = None
             WriteFiles = []
         }
     member this.ConfigModel =
@@ -74,6 +84,7 @@ type CloudConfig =
                 else this.Packages |> Seq.map (fun p -> p.Model)
             PackageUpdate = this.PackageUpdate |> Option.toNullable
             PackageUpgrade = this.PackageUpgrade |> Option.toNullable
+            Runcmd = this.RunCmd |> Option.map(fun runCmd -> runCmd.Model) |> Option.toObj
             WriteFiles =
                 if this.WriteFiles |> Seq.isEmpty then null
                 else this.WriteFiles

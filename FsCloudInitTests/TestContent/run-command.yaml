@@ -1,0 +1,10 @@
+#cloud-config
+runcmd:
+- - ls
+  - -l
+  - /
+- - sh
+  - -c
+  - date >> whatsthetime.txt && cat whatsthetime.txt
+- - apt
+  - update

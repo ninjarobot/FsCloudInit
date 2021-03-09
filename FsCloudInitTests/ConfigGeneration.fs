@@ -97,4 +97,17 @@ let tests =
             |> Writer.write
             |> matchExpectedAt "file-embedding.yaml"
         }
+        test "Run a command" {
+            {
+                CloudConfig.Default with
+                    RunCmd =
+                        [
+                            [ "ls"; "-l"; "/" ]
+                            [ "sh"; "-c"; "date >> whatsthetime.txt && cat whatsthetime.txt" ]
+                            "apt update".Split null |> List.ofArray
+                        ] |> RunCmd |> Some
+            }
+            |> Writer.write
+            |> matchExpectedAt "run-command.yaml"
+        }
     ]
