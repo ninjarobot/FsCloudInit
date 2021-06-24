@@ -1,16 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFrameworks>net5.0;netstandard2.0</TargetFrameworks>
+        <Authors>Dave Curylo</Authors>
+        <Copyright>2021 Dave Curylo</Copyright>
+        <PackageProjectUrl>https://github.com/ninjarobot/FsCloudInit</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/ninjarobot/FsCloudInit</RepositoryUrl>
+        <PackageTags>cloudinit</PackageTags>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
 
+    <ItemGroup>
+        <None Include="../LICENSE" Pack="true" PackagePath="" />
+    </ItemGroup>
+    
     <ItemGroup>
         <Compile Include="CloudConfig.fs" />
         <Compile Include="Writer.fs" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="YamlDotNet" Version="9.1.4" />
+      <PackageReference Include="YamlDotNet" Version="11.*" />
     </ItemGroup>
 
 </Project>
