@@ -3,7 +3,7 @@ FsCloudInit
 
 Create [cloud-init](https://cloudinit.readthedocs.io) VM configuration files in F#.
 
-![Build and Test](https://github.com/ninjarobot/FsCloudInit/actions/workflows/build-and-test.yml/badge.svg)
+[![Build and Test](https://github.com/ninjarobot/FsCloudInit/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/ninjarobot/FsCloudInit/actions/workflows/build-and-test.yml)
 [![FsCloudInit on Nuget](https://buildstats.info/nuget/FsCloudInit)](https://www.nuget.org/packages/FsCloudInit/)
 
 ### Examples
