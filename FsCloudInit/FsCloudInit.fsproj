@@ -17,6 +17,7 @@
     
     <ItemGroup>
         <Compile Include="CloudConfig.fs" />
+        <Compile Include="Builders.fs" />
         <Compile Include="Writer.fs" />
     </ItemGroup>
 

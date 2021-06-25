@@ -8,25 +8,35 @@ module FileEncoding =
      let Base64 = "b64"
 
 [<Flags>]
-type FilePermission =
+type PosixFilePerm =
     | None = 0
     | Execute = 1
     | Write = 2
     | Read = 4
 
 type FilePermissions = {
-    User : FilePermission
-    Group : FilePermission
-    Others : FilePermission
+    User : PosixFilePerm
+    Group : PosixFilePerm
+    Others : PosixFilePerm
 }
     with
-        static member None = FilePermission.None
-        static member R = FilePermission.Read
-        static member RW = FilePermission.Read ||| FilePermission.Write
-        static member RX = FilePermission.Read ||| FilePermission.Execute
-        static member RWX = FilePermission.Read ||| FilePermission.Write ||| FilePermission.Execute
+        static member None = PosixFilePerm.None
+        static member R = PosixFilePerm.Read
+        static member RW = PosixFilePerm.Read ||| PosixFilePerm.Write
+        static member RX = PosixFilePerm.Read ||| PosixFilePerm.Execute
+        static member RWX = PosixFilePerm.Read ||| PosixFilePerm.Write ||| PosixFilePerm.Execute
         member this.Value =
             $"0{int this.User}{int this.Group}{int this.Others}"
+        static member Parse (s:string) =
+            match UInt32.TryParse s with
+            | true, num when num > 777u -> invalidArg "string" "Invalid values for permission flags."
+            | true, num ->
+                {
+                    User = enum<PosixFilePerm> (int (((num % 1000u) - (num % 100u)) / 100u))
+                    Group = enum<PosixFilePerm> (int (((num % 100u) - (num % 10u)) / 10u))
+                    Others = enum<PosixFilePerm> (int (((num % 10u) - (num % 1u)) / 1u))
+                }
+            | false, _ -> invalidArg "string" "Malformed permission flags."
 
 type WriteFile =
     {

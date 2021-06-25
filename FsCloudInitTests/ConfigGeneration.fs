@@ -1,15 +1,9 @@
-module Tests
+module ConfigGeneration
 
 open System
-open System.IO
-open FsCloudInit
 open Expecto
-
-let http = new System.Net.Http.HttpClient()
-
-let matchExpectedAt (expectedContentFile:string) (generatedConfig:string) =
-    let expected = File.ReadAllText $"TestContent/{expectedContentFile}"
-    Expect.equal (generatedConfig.Trim()) (expected.Trim()) $"Did not match expected config at TestContent/{expectedContentFile}"
+open TestShared
+open FsCloudInit
 
 [<Tests>]
 let tests =
@@ -97,7 +91,7 @@ let tests =
             |> Writer.write
             |> matchExpectedAt "file-embedding.yaml"
         }
-        test "File permission strings" {
+        test "File permission string generation" {
             let perms1 = {
                 User = FilePermissions.RWX
                 Group = FilePermissions.RW
@@ -122,6 +116,15 @@ let tests =
                 Others = FilePermissions.None
             }
             Expect.equal perms4.Value "0400" "Unexpected permission mask perms4"
+        }
+        test "File permission string parsing" {
+            let perms764 = FilePermissions.Parse "764"
+            let expected = {
+                User = FilePermissions.RWX
+                Group = FilePermissions.RW
+                Others = FilePermissions.R
+            }
+            Expect.equal perms764 expected "Parsing permissions returned incorrect value."
         }
         test "Embed readonly file" {
             let content = "hello world"

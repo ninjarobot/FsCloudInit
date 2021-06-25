@@ -1,12 +1,96 @@
 FsCloudInit
 ===========
 
-Create [cloud-init](https://cloudinit.readthedocs.io) VM configuration files in F#.
+Create [cloud-init](https://cloudinit.readthedocs.io) virtual machine configuration files in F#.
 
 [![Build and Test](https://github.com/ninjarobot/FsCloudInit/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/ninjarobot/FsCloudInit/actions/workflows/build-and-test.yml)
 [![FsCloudInit on Nuget](https://buildstats.info/nuget/FsCloudInit)](https://www.nuget.org/packages/FsCloudInit/)
 
 ### Examples
+
+FsCloudInit includes configuration builders for many common tasks to simplify building the cloud-config file.
+
+#### Builders or records
+
+Builders can reduce some of the complexity by handling things like type casting and using sane defaults.
+
+```f#
+cloudConfig {
+    package_upgrade true
+    add_packages [
+        "httpd"
+    ]
+}
+|> Writer.write
+```
+
+It's also possible without the builder.
+
+```f#
+{
+    CloudConfig.Default with
+        Packages = [ Package "httpd" ]
+        PackageUpgrade = Some true
+}
+|> Writer.write
+```
+
+
+#### Write files
+
+Write some arbitrary data to a file. It will be base64 encoded automatically so there won't be any character escaping issues.
+
+```f#
+cloudConfig {
+    write_files [
+        writeFile {
+            path "/var/lib/data/hello"
+            content "hello world"
+            owner "root:root"
+            permissions "400"
+        }
+    ]
+}
+|> Writer.write
+```
+
+#### Install packages
+
+```f#
+    cloudConfig {
+        package_upgrade
+        add_packages [
+            "curl"
+            "screen"
+            "httpd"
+        ]
+    }
+    |> Writer.write
+```
+
+#### Run commands
+
+```f#
+cloudConfig {
+    run_commands [
+        [ "ls"; "-l"; "/" ]
+        [ "sh"; "-c"; "date >> whatsthetime.txt && cat whatsthetime.txt" ]
+        "apt update".Split null
+    ]
+}
+|> Writer.write
+```
+
+#### Print a final message when done
+
+```f#
+cloudConfig {
+    final_message "#### Cloud-init is done! ####"
+}
+|> Writer.write
+```
+
+#### Pull external data for the configuration
 
 Installing the dotnet 5.0 SDK on a VM. This pulls the Microsoft package source and
 signing key when building the cloud-init configuration.
@@ -15,24 +99,23 @@ signing key when building the cloud-init configuration.
 async {
     // curl -sSL https://packages.microsoft.com/config/ubuntu/18.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
     let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/18.04/prod.list" |> Async.AwaitTask
-    let! aptSource = aptSourceRes.Content.ReadAsStringAsync () |> Async.AwaitTask
+    let! aptSourceVal = aptSourceRes.Content.ReadAsStringAsync () |> Async.AwaitTask
     // curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
     let! gpgKeyRes = http.GetAsync "https://packages.microsoft.com/keys/microsoft.asc" |> Async.AwaitTask
     let! gpgKey = gpgKeyRes.Content.ReadAsStringAsync () |> Async.AwaitTask
-    {
-        CloudConfig.Default with
-            Apt =
-                Apt (
-                    Sources =
-                        dict [
-                            "microsoft-prod", { AptSource.Default with Key = gpgKey; Source = aptSource}
-                        ]
-                ) |> Some
-            PackageUpdate = Some true
-            Packages = [
-                Package "apt-transport-https"
-                PackageVersion (PackageName="dotnet-sdk-5.0", PackageVersion="5.0.103-1")
-            ]
+    cloudConfig {
+        add_apt_sources [
+            aptSource {
+                name "microsoft-prod"
+                key gpgKey
+                source aptSourceVal
+            }
+        ]
+        package_update true
+        add_packages [
+            Package "apt-transport-https"
+            PackageVersion (PackageName="dotnet-sdk-5.0", PackageVersion="5.0.103-1")
+        ]
     }
     |> Writer.write
     |> Console.WriteLine
