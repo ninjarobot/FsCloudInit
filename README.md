@@ -8,95 +8,63 @@ Create [cloud-init](https://cloudinit.readthedocs.io) virtual machine configurat
 
 ### Examples
 
-FsCloudInit includes configuration builders for many common tasks to simplify building the cloud-config file.
-
-#### Builders or records
-
-Builders can reduce some of the complexity by handling things like type casting and using sane defaults.
+FsCloudInit includes configuration builders for many common tasks to simplify building the cloud-config file while also providing type checking around configuration code.
 
 ```f#
+#r "nuget: FsCloudInit"
+
+open FsCloudInit
+open FsCloudInit.Builders
+
 cloudConfig {
     package_upgrade true
     add_packages [
+        "curl"
         "httpd"
     ]
 }
 |> Writer.write
+|> System.Console.WriteLine
 ```
 
-It's also possible without the builder.
+This code outputs a simple cloud-config file.
+
+```yaml
+#cloud-config
+package_upgrade: true
+packages:
+- curl
+- httpd
+
+```
+
+#### Builders or records
+
+Builders can reduce some of the complexity by handling things like type casting and using sane defaults, but it's also possible without the builder.
 
 ```f#
+#r "nuget: FsCloudInit"
+
+open FsCloudInit
+
 {
     CloudConfig.Default with
         Packages = [ Package "httpd" ]
         PackageUpgrade = Some true
 }
 |> Writer.write
-```
-
-
-#### Write files
-
-Write some arbitrary data to a file. It will be base64 encoded automatically so there won't be any character escaping issues.
-
-```f#
-cloudConfig {
-    write_files [
-        writeFile {
-            path "/var/lib/data/hello"
-            content "hello world"
-            owner "root:root"
-            permissions "400"
-        }
-    ]
-}
-|> Writer.write
-```
-
-#### Install packages
-
-```f#
-    cloudConfig {
-        package_upgrade
-        add_packages [
-            "curl"
-            "screen"
-            "httpd"
-        ]
-    }
-    |> Writer.write
-```
-
-#### Run commands
-
-```f#
-cloudConfig {
-    run_commands [
-        [ "ls"; "-l"; "/" ]
-        [ "sh"; "-c"; "date >> whatsthetime.txt && cat whatsthetime.txt" ]
-        "apt update".Split null
-    ]
-}
-|> Writer.write
-```
-
-#### Print a final message when done
-
-```f#
-cloudConfig {
-    final_message "#### Cloud-init is done! ####"
-}
-|> Writer.write
+|> System.Console.WriteLine
 ```
 
 #### Pull external data for the configuration
 
-Installing the dotnet 5.0 SDK on a VM. This pulls the Microsoft package source and
-signing key when building the cloud-init configuration.
+Often the configuration is more complex or even has external dependencies, and we get the benefits of a full language and framework.
+
+This configuration will install the dotnet 5.0 SDK on a new VM. This pulls the Microsoft package source and signing key when building the cloud-init configuration.
 
 ```f#
 async {
+    use http = System.Net.Http.HttpClient ()
     // curl -sSL https://packages.microsoft.com/config/ubuntu/18.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
     let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/18.04/prod.list" |> Async.AwaitTask
     let! aptSourceVal = aptSourceRes.Content.ReadAsStringAsync () |> Async.AwaitTask
@@ -172,4 +140,59 @@ packages:
 - apt-transport-https
 - dotnet-sdk-5.0
 package_update: true
+```
+
+
+#### Write files
+
+Write some arbitrary data to a file. It will be base64 encoded automatically so there won't be any character escaping issues.
+
+```f#
+cloudConfig {
+    write_files [
+        writeFile {
+            path "/var/lib/data/hello"
+            content "hello world"
+            owner "root:root"
+            permissions "400"
+        }
+    ]
+}
+|> Writer.write
+```
+
+#### Install packages
+
+```f#
+    cloudConfig {
+        package_upgrade
+        add_packages [
+            "curl"
+            "screen"
+            "httpd"
+        ]
+    }
+    |> Writer.write
+```
+
+#### Run commands
+
+```f#
+cloudConfig {
+    run_commands [
+        [ "ls"; "-l"; "/" ]
+        [ "sh"; "-c"; "date >> whatsthetime.txt && cat whatsthetime.txt" ]
+        "apt update".Split null
+    ]
+}
+|> Writer.write
+```
+
+#### Print a final message when done
+
+```f#
+cloudConfig {
+    final_message "#### Cloud-init is done! ####"
+}
+|> Writer.write
 ```
