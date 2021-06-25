@@ -97,6 +97,53 @@ let tests =
             |> Writer.write
             |> matchExpectedAt "file-embedding.yaml"
         }
+        test "File permission strings" {
+            let perms1 = {
+                User = FilePermissions.RWX
+                Group = FilePermissions.RW
+                Others = FilePermissions.R
+            }
+            Expect.equal perms1.Value "0764" "Unexpected permission mask perms1"
+            let perms2 = {
+                User = FilePermissions.None
+                Group = FilePermissions.None
+                Others = FilePermissions.None
+            }
+            Expect.equal perms2.Value "0000" "Unexpected permission mask perms2"
+            let perms3 = {
+                User = FilePermissions.RW
+                Group = FilePermissions.R
+                Others = FilePermissions.R
+            }
+            Expect.equal perms3.Value "0644" "Unexpected permission mask perms3"
+            let perms4 = {
+                User = FilePermissions.R
+                Group = FilePermissions.None
+                Others = FilePermissions.None
+            }
+            Expect.equal perms4.Value "0400" "Unexpected permission mask perms4"
+        }
+        test "Embed readonly file" {
+            let content = "hello world"
+            {
+                CloudConfig.Default with
+                    WriteFiles = [
+                        {
+                            WriteFile.Default with
+                                Encoding = FileEncoding.Base64
+                                Content = content |> System.Text.Encoding.UTF8.GetBytes |> Convert.ToBase64String
+                                Path = "/var/lib/data/hello"
+                                Owner = "azureuser:azureuser"
+                                Permissions = {
+                                    User = FilePermissions.R
+                                    Group = FilePermissions.None
+                                    Others = FilePermissions.None }.Value
+                        }
+                    ]
+            }
+            |> Writer.write
+            |> matchExpectedAt "file-embedding-readonly.yaml"
+        }
         test "Run a command" {
             {
                 CloudConfig.Default with
