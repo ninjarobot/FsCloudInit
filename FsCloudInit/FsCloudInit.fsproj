@@ -5,6 +5,7 @@
         <Authors>Dave Curylo</Authors>
         <Copyright>2021 Dave Curylo</Copyright>
         <PackageProjectUrl>https://github.com/ninjarobot/FsCloudInit</PackageProjectUrl>
+        <Description>Build cloud-init configuration files with F#.</Description>
         <RepositoryUrl>https://github.com/ninjarobot/FsCloudInit</RepositoryUrl>
         <PackageTags>cloudinit</PackageTags>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
