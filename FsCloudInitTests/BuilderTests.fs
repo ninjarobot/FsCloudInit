@@ -1,5 +1,8 @@
 module BuilderTests
 
+open System.Collections.Generic
+open System.IO
+open System.IO.Compression
 open Expecto
 open TestShared
 open FsCloudInit
@@ -31,16 +34,25 @@ let tests =
             |> matchExpectedAt "file-embedding.yaml"
         }
         test "Embed gzipped file builder" {
-            cloudConfig {
-                write_files [
-                    writeFile {
-                        path "/var/lib/data/hello"
-                        gzip_data "hello world"
-                    }
-                ]
-            }
-            |> Writer.write
-            |> matchExpectedAt "file-embedding-gzip.yaml"
+            let yaml =
+                cloudConfig {
+                    write_files [
+                        writeFile {
+                            path "/var/lib/data/hello"
+                            gzip_data "hello world"
+                        }
+                    ]
+                }
+                |> Writer.write
+            let data:Dictionary<string, ResizeArray<Dictionary<string,string>>> =
+                YamlDotNet.Serialization.Deserializer().Deserialize(yaml)
+            let content = data.["write_files"].[0].["content"]
+            let gzContent = content |> System.Convert.FromBase64String
+            use uncompressed = new MemoryStream()
+            using (new GZipStream(new MemoryStream(gzContent), CompressionMode.Decompress))
+                ( fun gz -> gz.CopyTo uncompressed )
+            let helloWorld = uncompressed.ToArray() |> System.Text.Encoding.UTF8.GetString
+            Expect.equal helloWorld "hello world" "Unzipped data didn't match"
         }
         test "Embed readonly file builder" {
             cloudConfig {

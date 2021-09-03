@@ -1,6 +1,7 @@
 module ConfigGeneration
 
 open System
+open System.Collections.Generic
 open System.IO
 open System.IO.Compression
 open Expecto
@@ -99,19 +100,28 @@ let tests =
             using (new GZipStream(compressedContent, CompressionMode.Compress))
                 (fun gz -> contentStream.CopyTo(gz))
             let b64 = compressedContent.ToArray() |> Convert.ToBase64String
-            {
-                CloudConfig.Default with
-                    WriteFiles = [
-                        {
-                            WriteFile.Default with
-                                Encoding = FileEncoding.GzipBase64
-                                Content = b64
-                                Path = "/var/lib/data/hello"
-                        }
-                    ]
-            }
-            |> Writer.write
-            |> matchExpectedAt "file-embedding-gzip.yaml"
+            let yaml =
+                {
+                    CloudConfig.Default with
+                        WriteFiles = [
+                            {
+                                WriteFile.Default with
+                                    Encoding = FileEncoding.GzipBase64
+                                    Content = b64
+                                    Path = "/var/lib/data/hello"
+                            }
+                        ]
+                }
+                |> Writer.write
+            let data:Dictionary<string, ResizeArray<Dictionary<string,string>>> =
+                YamlDotNet.Serialization.Deserializer().Deserialize(yaml)
+            let content = data.["write_files"].[0].["content"]
+            let gzContent = content |> System.Convert.FromBase64String
+            use uncompressed = new MemoryStream()
+            using (new GZipStream(new MemoryStream(gzContent), CompressionMode.Decompress))
+                ( fun gz -> gz.CopyTo uncompressed )
+            let helloWorld = uncompressed.ToArray() |> System.Text.Encoding.UTF8.GetString
+            Expect.equal helloWorld "hello world" "Unzipped data didn't match"
         }
         test "File permission string generation" {
             let perms1 = {

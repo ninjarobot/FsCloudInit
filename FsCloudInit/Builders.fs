@@ -1,6 +1,7 @@
 namespace FsCloudInit
 
 open System
+open System.IO.Compression
 
 module Builders =
 
@@ -18,8 +19,7 @@ module Builders =
         [<CustomOperation "gzip_data">]
         member _.GZipData (writeFile:WriteFile, contentStream:System.IO.Stream) =
             use compressed = new System.IO.MemoryStream()
-            using (new System.IO.Compression.GZipStream(compressed, System.IO.Compression.CompressionMode.Compress))
-                ( fun gz -> contentStream.CopyTo(gz) )
+            using (new GZipStream(compressed, CompressionMode.Compress)) contentStream.CopyTo
             let content = compressed.ToArray() |> Convert.ToBase64String
             { writeFile with 
                 Encoding = FileEncoding.GzipBase64
