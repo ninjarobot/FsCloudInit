@@ -1,6 +1,8 @@
 module ConfigGeneration
 
 open System
+open System.IO
+open System.IO.Compression
 open Expecto
 open TestShared
 open FsCloudInit
@@ -90,6 +92,26 @@ let tests =
             }
             |> Writer.write
             |> matchExpectedAt "file-embedding.yaml"
+        }
+        test "Embed Gzipped file" {
+            let contentStream = new MemoryStream("hello world" |> System.Text.Encoding.UTF8.GetBytes)
+            use compressedContent = new MemoryStream()
+            using (new GZipStream(compressedContent, CompressionMode.Compress))
+                (fun gz -> contentStream.CopyTo(gz))
+            let b64 = compressedContent.ToArray() |> Convert.ToBase64String
+            {
+                CloudConfig.Default with
+                    WriteFiles = [
+                        {
+                            WriteFile.Default with
+                                Encoding = FileEncoding.GzipBase64
+                                Content = b64
+                                Path = "/var/lib/data/hello"
+                        }
+                    ]
+            }
+            |> Writer.write
+            |> matchExpectedAt "file-embedding-gzip.yaml"
         }
         test "File permission string generation" {
             let perms1 = {

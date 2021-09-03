@@ -15,6 +15,21 @@ module Builders =
             { writeFile with 
                 Encoding = FileEncoding.Base64
                 Content = content |> System.Text.Encoding.UTF8.GetBytes |> Convert.ToBase64String }
+        [<CustomOperation "gzip_data">]
+        member _.GZipData (writeFile:WriteFile, contentStream:System.IO.Stream) =
+            use compressed = new System.IO.MemoryStream()
+            using (new System.IO.Compression.GZipStream(compressed, System.IO.Compression.CompressionMode.Compress))
+                ( fun gz -> contentStream.CopyTo(gz) )
+            let content = compressed.ToArray() |> Convert.ToBase64String
+            { writeFile with 
+                Encoding = FileEncoding.GzipBase64
+                Content = content }
+        member this.GZipData (writeFile:WriteFile, content:byte []) =
+            use ms = new System.IO.MemoryStream(content)
+            this.GZipData (writeFile, ms)
+        member this.GZipData (writeFile:WriteFile, content:string) =
+            use ms = new System.IO.MemoryStream(content |> System.Text.Encoding.UTF8.GetBytes)
+            this.GZipData (writeFile, ms)
         [<CustomOperation "base64_encoded_content">]
         member _.Base64EncodedContent (writeFile:WriteFile, content:string) = 
             { writeFile with 
