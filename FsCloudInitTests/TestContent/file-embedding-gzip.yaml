@@ -1,0 +1,5 @@
+#cloud-config
+write_files:
+- encoding: gz+base64
+  content: H4sIAAAAAAAAE8tIzcnJVyjPL8pJAQCFEUoNCwAAAA==
+  path: /var/lib/data/hello

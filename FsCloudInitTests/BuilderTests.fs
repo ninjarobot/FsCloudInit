@@ -30,6 +30,18 @@ let tests =
             |> Writer.write
             |> matchExpectedAt "file-embedding.yaml"
         }
+        test "Embed gzipped file builder" {
+            cloudConfig {
+                write_files [
+                    writeFile {
+                        path "/var/lib/data/hello"
+                        gzip_data "hello world"
+                    }
+                ]
+            }
+            |> Writer.write
+            |> matchExpectedAt "file-embedding-gzip.yaml"
+        }
         test "Embed readonly file builder" {
             cloudConfig {
                 write_files [

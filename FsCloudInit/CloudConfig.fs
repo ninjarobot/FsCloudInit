@@ -6,6 +6,8 @@ open System.Collections.Generic
 module FileEncoding =
      [<Literal>]
      let Base64 = "b64"
+     [<Literal>]
+     let GzipBase64 = "gz+base64"
 
 [<Flags>]
 type PosixFilePerm =
