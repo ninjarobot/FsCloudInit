@@ -21,6 +21,9 @@
         <Compile Include="Writer.fs" />
     </ItemGroup>
 
+    <ItemGroup Condition=" '$(TargetFramework)' != 'net6.0' ">
+      <PackageReference Update="FSharp.Core" Version="5.0.0" />
+    </ItemGroup>
     <ItemGroup>
       <PackageReference Include="YamlDotNet" Version="11.*" />
     </ItemGroup>
