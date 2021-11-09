@@ -69,7 +69,7 @@ let tests =
             |> matchExpectedAt "file-embedding-readonly.yaml"
         }
         testAsync "Install dotnet with aptSource builders" {
-            let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/18.04/prod.list" |> Async.AwaitTask
+            let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/20.04/prod.list" |> Async.AwaitTask
             let! aptSourceVal = aptSourceRes.Content.ReadAsStringAsync () |> Async.AwaitTask
             let! gpgKeyRes = http.GetAsync "https://packages.microsoft.com/keys/microsoft.asc" |> Async.AwaitTask
             let! gpgKey = gpgKeyRes.Content.ReadAsStringAsync () |> Async.AwaitTask
@@ -84,7 +84,7 @@ let tests =
                 package_update true
                 add_packages [
                     Package "apt-transport-https"
-                    PackageVersion (PackageName="dotnet-sdk-5.0", PackageVersion="5.0.103-1")
+                    PackageVersion (PackageName="dotnet-sdk-6.0", PackageVersion="6.0.100-1")
                 ]
             }
             |> Writer.write

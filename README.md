@@ -60,15 +60,13 @@ open FsCloudInit
 
 Often the configuration is more complex or even has external dependencies, and we get the benefits of a full language and framework.
 
-This configuration will install the dotnet 5.0 SDK on a new VM. This pulls the Microsoft package source and signing key when building the cloud-init configuration.
+This configuration will install the dotnet 6.0 SDK on a new VM. This pulls the Microsoft package source and signing key when building the cloud-init configuration.
 
 ```f#
 async {
     use http = System.Net.Http.HttpClient ()
-    // curl -sSL https://packages.microsoft.com/config/ubuntu/18.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
-    let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/18.04/prod.list" |> Async.AwaitTask
+    let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/20.04/prod.list" |> Async.AwaitTask
     let! aptSourceVal = aptSourceRes.Content.ReadAsStringAsync () |> Async.AwaitTask
-    // curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
     let! gpgKeyRes = http.GetAsync "https://packages.microsoft.com/keys/microsoft.asc" |> Async.AwaitTask
     let! gpgKey = gpgKeyRes.Content.ReadAsStringAsync () |> Async.AwaitTask
     cloudConfig {
@@ -82,7 +80,7 @@ async {
         package_update true
         add_packages [
             Package "apt-transport-https"
-            PackageVersion (PackageName="dotnet-sdk-5.0", PackageVersion="5.0.103-1")
+            PackageVersion (PackageName="dotnet-sdk-6.0", PackageVersion="6.0.100-1")
         ]
     }
     |> Writer.write
@@ -94,7 +92,7 @@ The above snippet writes a cloud-init configuration file to the console, resulti
 the following configuration file that can be used to install the SDK on a server:
 
 ```yaml
-#cloud-config           
+#cloud-config
 apt:
   sources:
     microsoft-prod:
@@ -135,11 +133,13 @@ apt:
         =J6gs
 
         -----END PGP PUBLIC KEY BLOCK-----
-      source: deb [arch=amd64] https://packages.microsoft.com/ubuntu/18.04/prod bionic main
-packages:
-- apt-transport-https
-- dotnet-sdk-5.0
+      source: >
+        deb [arch=amd64,armhf,arm64] https://packages.microsoft.com/ubuntu/20.04/prod focal main
 package_update: true
+packages:
+  - apt-transport-https
+  - - dotnet-sdk-6.0
+    - 6.0.100-1
 ```
 
 

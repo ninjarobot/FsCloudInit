@@ -39,8 +39,9 @@ apt:
         =J6gs
 
         -----END PGP PUBLIC KEY BLOCK-----
-      source: deb [arch=amd64] https://packages.microsoft.com/ubuntu/18.04/prod bionic main
+      source: >
+        deb [arch=amd64,armhf,arm64] https://packages.microsoft.com/ubuntu/20.04/prod focal main
 package_update: true
 packages:
 - apt-transport-https
-- dotnet-sdk-5.0
+- dotnet-sdk-6.0

@@ -34,8 +34,8 @@ let tests =
             |> matchExpectedAt "package-install.yaml"
         }
         testAsync "Embed Microsoft apt source and key" {
-            // curl -sSL https://packages.microsoft.com/config/ubuntu/18.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
-            let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/18.04/prod.list" |> Async.AwaitTask
+            // curl -sSL https://packages.microsoft.com/config/ubuntu/20.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft-prod.list
+            let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/20.04/prod.list" |> Async.AwaitTask
             let! aptSource = aptSourceRes.Content.ReadAsStringAsync () |> Async.AwaitTask
             // curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
             let! gpgKeyRes = http.GetAsync "https://packages.microsoft.com/keys/microsoft.asc" |> Async.AwaitTask
@@ -50,13 +50,13 @@ let tests =
                                 ]
                         ) |> Some
                     PackageUpdate = Some true
-                    Packages = [Package "apt-transport-https"; Package "dotnet-sdk-5.0"]
+                    Packages = [Package "apt-transport-https"; Package "dotnet-sdk-6.0"]
             }
             |> Writer.write
             |> matchExpectedAt "apt-source.yaml"
         }
         testAsync "Install specific dotnet SDK version" {
-            let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/18.04/prod.list" |> Async.AwaitTask
+            let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/20.04/prod.list" |> Async.AwaitTask
             let! aptSource = aptSourceRes.Content.ReadAsStringAsync () |> Async.AwaitTask
             let! gpgKeyRes = http.GetAsync "https://packages.microsoft.com/keys/microsoft.asc" |> Async.AwaitTask
             let! gpgKey = gpgKeyRes.Content.ReadAsStringAsync () |> Async.AwaitTask
@@ -72,7 +72,7 @@ let tests =
                     PackageUpdate = Some true
                     Packages = [
                         Package "apt-transport-https"
-                        PackageVersion (PackageName="dotnet-sdk-5.0", PackageVersion="5.0.103-1")
+                        PackageVersion (PackageName="dotnet-sdk-6.0", PackageVersion="6.0.100-1")
                     ]
             }
             |> Writer.write
