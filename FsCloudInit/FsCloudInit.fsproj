@@ -5,6 +5,7 @@
         <Authors>Dave Curylo</Authors>
         <Copyright>2021 Dave Curylo</Copyright>
         <PackageProjectUrl>https://github.com/ninjarobot/FsCloudInit</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <Description>Build cloud-init configuration files with F#.</Description>
         <RepositoryUrl>https://github.com/ninjarobot/FsCloudInit</RepositoryUrl>
         <PackageTags>cloudinit</PackageTags>
@@ -13,6 +14,7 @@
 
     <ItemGroup>
         <None Include="../LICENSE" Pack="true" PackagePath="" />
+        <None Include="../README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
     
     <ItemGroup>
