@@ -46,6 +46,7 @@ type WriteFile =
         Content : string
         Owner : string
         Path : string
+        [<YamlDotNet.Serialization.YamlMember(ScalarStyle = YamlDotNet.Core.ScalarStyle.SingleQuoted)>]
         Permissions : string
         Append : bool
     }

@@ -4,4 +4,4 @@ write_files:
   content: aGVsbG8gd29ybGQ=
   owner: azureuser:azureuser
   path: /var/lib/data/hello
-  permissions: 0400
+  permissions: '0400'
