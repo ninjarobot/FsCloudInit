@@ -1,0 +1,15 @@
+[Unit]
+Description=My mvc app
+StartLimitIntervalSec=30s
+StartLimitBurst=3
+
+[Service]
+ExecStart=/usr/bin/dotnet run --urls http://*:8080 --environment Production
+User=azureuser
+WorkingDirectory=/home/azureuser/app
+Restart=on-failure
+RestartSec=5s
+TimeoutSec=100s
+
+[Install]
+WantedBy=multi-user.target
