@@ -49,6 +49,7 @@ type WriteFile =
         [<YamlDotNet.Serialization.YamlMember(ScalarStyle = YamlDotNet.Core.ScalarStyle.SingleQuoted)>]
         Permissions : string
         Append : bool
+        Defer : bool
     }
     static member Default =
         {
@@ -58,6 +59,7 @@ type WriteFile =
             Path = null
             Permissions = null
             Append = false
+            Defer = false
         }
 
 type AptSource =

@@ -161,6 +161,22 @@ cloudConfig {
 |> Writer.write
 ```
 
+If you are writing files that should be owned by users other than `root`, you often need to use `defer` so they are not written until after that user exists. When not deferred, depending on the version of cloud-init, the file may not be written or it may end up owned by `root`.
+
+```f#
+cloudConfig {
+    write_files [
+        writeFile {
+            path "/var/lib/data/hello"
+            content "hello world"
+            owner "myuser:myuser"
+            defer true
+        }
+    ]
+}
+|> Writer.write
+```
+
 #### Install packages
 
 ```f#

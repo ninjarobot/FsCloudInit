@@ -68,6 +68,20 @@ let tests =
             |> Writer.write
             |> matchExpectedAt "file-embedding-readonly.yaml"
         }
+        test "Embed file with defer builder" {
+            cloudConfig {
+                write_files [
+                    writeFile {
+                        path "/var/lib/data/hello"
+                        content "hello world"
+                        owner "azureuser:azureuser"
+                        defer true
+                    }
+                ]
+            }
+            |> Writer.write
+            |> matchExpectedAt "file-embedding-defer.yaml"
+        }
         testAsync "Install dotnet with aptSource builders" {
             let! aptSourceRes = http.GetAsync "https://packages.microsoft.com/config/ubuntu/20.04/prod.list" |> Async.AwaitTask
             let! aptSourceVal = aptSourceRes.Content.ReadAsStringAsync () |> Async.AwaitTask

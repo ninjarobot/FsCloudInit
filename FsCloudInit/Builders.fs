@@ -46,6 +46,9 @@ module Builders =
         [<CustomOperation "append">]
         member _.Append (writeFile:WriteFile, append:bool) =
             { writeFile with Append = append }
+        [<CustomOperation "defer">]
+        member _.Defer (writeFile:WriteFile, defer:bool) =
+            { writeFile with Defer = defer }
 
     let writeFile = WriteFileBuilder ()
 
