@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>net6.0;net5.0;netstandard2.0</TargetFrameworks>
         <Authors>Dave Curylo</Authors>
-        <Copyright>2021 Dave Curylo</Copyright>
+        <Copyright>2021-2022 Dave Curylo</Copyright>
         <PackageProjectUrl>https://github.com/ninjarobot/FsCloudInit</PackageProjectUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Description>Build cloud-init configuration files with F#.</Description>
