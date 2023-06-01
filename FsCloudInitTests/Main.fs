@@ -1,4 +1,5 @@
 ﻿module FsCloudInitTests
+
 open Expecto
 
 [<EntryPoint>]
