@@ -1,6 +1,5 @@
 module TestShared
 
-open System
 open System.IO
 open Expecto
 

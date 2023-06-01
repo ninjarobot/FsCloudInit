@@ -46,7 +46,7 @@ let tests =
                 |> Writer.write
             let data:Dictionary<string, ResizeArray<Dictionary<string,string>>> =
                 YamlDotNet.Serialization.Deserializer().Deserialize(yaml)
-            let content = data.["write_files"].[0].["content"]
+            let content = data["write_files"].[0]["content"]
             let gzContent = content |> System.Convert.FromBase64String
             use uncompressed = new MemoryStream()
             using (new GZipStream(new MemoryStream(gzContent), CompressionMode.Decompress))

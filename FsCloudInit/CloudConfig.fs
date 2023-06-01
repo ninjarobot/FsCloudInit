@@ -93,7 +93,7 @@ type RunCmd =
     | RunCmd of Cmd list
     member this.Model : string seq seq =
         match this with
-        | RunCmd (commands) ->
+        | RunCmd commands ->
             commands |> Seq.map Seq.ofList
 
 type CloudConfig =

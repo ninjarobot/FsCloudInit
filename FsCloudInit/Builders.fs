@@ -90,7 +90,7 @@ module Builders =
             match cloudConfig.Apt with
             | Some apt ->
                 for source in aptSources do
-                    apt.Sources.[source.Name] <- source.Source
+                    apt.Sources[source.Name] <- source.Source
                 cloudConfig
             | None ->
                 let sources = aptSources |> Seq.map (fun s -> s.Name, s.Source) |> dict
