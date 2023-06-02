@@ -102,6 +102,91 @@ module Builders =
 
     let aptSource = AptSourceBuilder()
 
+    /// Builder for a User.
+    type UserBuilder() =
+        member _.Yield _ = User.Default
+
+        [<CustomOperation "name">]
+        member _.Name(user: User, name: string) = { user with Name = name }
+
+        [<CustomOperation "expiredate">]
+        member _.ExpireDate(user: User, expireDate: DateTimeOffset) =
+            { user with
+                ExpiredDate = expireDate.ToString("yyyy-MM-dd") }
+
+        [<CustomOperation "gecos">]
+        member _.Gecos(user: User, gecos: string) = { user with Gecos = gecos }
+
+        [<CustomOperation "groups">]
+        member _.Groups(user: User, groups: string seq) = { user with Groups = groups }
+
+        [<CustomOperation "homedir">]
+        member _.HomeDir(user: User, homedir: string) = { user with HomeDir = homedir }
+
+        [<CustomOperation "inactive">]
+        member _.InactiveInDays(user: User, days: int) = { user with Inactive = Nullable(days) }
+
+        [<CustomOperation "lock_passwd">]
+        member _.LockPasswd(user: User, lockPasswd: bool) = { user with LockPasswd = lockPasswd }
+
+        [<CustomOperation "no_create_home">]
+        member _.NoCreateHome(user: User, noCreateHome: bool) =
+            { user with
+                NoCreateHome = noCreateHome }
+
+        [<CustomOperation "no_log_init">]
+        member _.NoLogInit(user: User, noLogInit: bool) = { user with NoLogInit = noLogInit }
+
+        [<CustomOperation "no_user_group">]
+        member _.NoUserGroup(user: User, noUserGroup: bool) = { user with NoUserGroup = noUserGroup }
+
+        [<CustomOperation "create_groups">]
+        member _.CreateGroups(user: User, createGroups: bool) =
+            { user with
+                CreateGroups = createGroups }
+
+        [<CustomOperation "primary_group">]
+        member _.PrimaryGroup(user: User, primaryGroup: string) =
+            { user with
+                PrimaryGroup = primaryGroup }
+
+        [<CustomOperation "selinux_user">]
+        member _.SelinuxUser(user: User, selinuxUser: string) = { user with SelinuxUser = selinuxUser }
+
+        [<CustomOperation "shell">]
+        member _.Shell(user: User, shell: string) = { user with Shell = shell }
+
+        [<CustomOperation "ssh_authorized_keys">]
+        member _.SshAuthorizedKeys(user: User, sshAuthorizedKeys: string seq) =
+            { user with
+                SshAuthorizedKeys = Seq.append user.SshAuthorizedKeys sshAuthorizedKeys }
+
+        [<CustomOperation "ssh_import_id">]
+        member _.SshImportId(user: User, sshImportIds: string seq) =
+            { user with
+                SshImportId = Seq.append user.SshImportId sshImportIds }
+
+        [<CustomOperation "ssh_import_github_id">]
+        member _.SshImportGitHubId(user: User, gitHubId: string) =
+            { user with
+                SshImportId = Seq.append user.SshImportId [ $"gh:{gitHubId}" ] }
+
+        [<CustomOperation "ssh_redirect_user">]
+        member _.SshRedirectUser(user: User, sshRedirectUser: bool) =
+            { user with
+                SshRedirectUser = sshRedirectUser }
+
+        [<CustomOperation "system">]
+        member _.System(user: User, system: bool) = { user with System = system }
+
+        [<CustomOperation "sudo">]
+        member _.Sudo(user: User, sudo: string) = { user with Sudo = sudo }
+
+        [<CustomOperation "uid">]
+        member _.Uid(user: User, uid: int) = { user with Uid = Nullable(uid) }
+
+    let user = UserBuilder()
+
     /// Builder for a CloudConfig record.
     type CloudConfigBuilder() =
         member _.Yield _ = CloudConfig.Default
@@ -162,5 +247,10 @@ module Builders =
                     | None -> cmdList
                     |> RunCmd
                     |> Some }
+
+        [<CustomOperation "users">]
+        member _.Users(cloudConfig: CloudConfig, users: User seq) =
+            { cloudConfig with
+                Users = Seq.append cloudConfig.Users users }
 
     let cloudConfig = CloudConfigBuilder()

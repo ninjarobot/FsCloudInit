@@ -1,0 +1,10 @@
+#cloud-config
+users:
+- default
+- name: itme
+  gecos: My Account
+  groups:
+  - sudo
+  ssh_import_id:
+  - gh:mygithubusername
+  sudo: ALL=(ALL) NOPASSWD:ALL

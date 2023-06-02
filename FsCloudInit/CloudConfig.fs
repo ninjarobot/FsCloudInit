@@ -2,6 +2,7 @@
 
 open System
 open System.Collections.Generic
+open YamlDotNet.Serialization
 
 module FileEncoding =
     [<Literal>]
@@ -38,12 +39,22 @@ type FilePermissions =
               Others = enum<PosixFilePerm> (int (((num % 10u) - (num % 1u)) / 1u)) }
         | false, _ -> invalidArg "string" "Malformed permission flags."
 
+module Sudo =
+    /// Defines sudo options as "ALL=(ALL) NOPASSWD:ALL"
+    let AllPermsNoPasswd = "ALL=(ALL) NOPASSWD:ALL"
+
+module internal Serialization =
+    let serializableSeq sequence =
+        if Seq.isEmpty sequence then null else ResizeArray sequence
+
+    let defaultIfTrue b = if b then Unchecked.defaultof<_> else b
+
 type WriteFile =
     { Encoding: string
       Content: string
       Owner: string
       Path: string
-      [<YamlDotNet.Serialization.YamlMember(ScalarStyle = YamlDotNet.Core.ScalarStyle.SingleQuoted)>]
+      [<YamlMember(ScalarStyle = YamlDotNet.Core.ScalarStyle.SingleQuoted)>]
       Permissions: string
       Append: bool
       Defer: bool }
@@ -90,6 +101,59 @@ type RunCmd =
         match this with
         | RunCmd commands -> commands |> Seq.map Seq.ofList
 
+type User =
+    { Name: string
+      ExpiredDate: string
+      Gecos: string
+      Groups: string seq
+      HomeDir: string
+      Inactive: Nullable<int>
+      LockPasswd: bool
+      NoCreateHome: bool
+      NoLogInit: bool
+      NoUserGroup: bool
+      CreateGroups: bool
+      PrimaryGroup: string
+      SelinuxUser: string
+      Shell: string
+      SshAuthorizedKeys: string seq
+      SshImportId: string seq
+      SshRedirectUser: bool
+      System: bool
+      Sudo: string
+      Uid: Nullable<int> }
+
+    static member Default =
+        { Name = null
+          ExpiredDate = null
+          Gecos = null
+          Groups = []
+          HomeDir = null
+          Inactive = Nullable()
+          LockPasswd = true
+          NoCreateHome = false
+          NoLogInit = false
+          NoUserGroup = false
+          CreateGroups = true
+          PrimaryGroup = null
+          SelinuxUser = null
+          Shell = null
+          SshAuthorizedKeys = []
+          SshImportId = []
+          SshRedirectUser = false
+          System = false
+          Sudo = null
+          Uid = Nullable() }
+
+    [<YamlIgnore>]
+    member this.Model =
+        { this with
+            CreateGroups = Serialization.defaultIfTrue this.CreateGroups
+            Groups = Serialization.serializableSeq this.Groups
+            LockPasswd = Serialization.defaultIfTrue this.LockPasswd
+            SshAuthorizedKeys = Serialization.serializableSeq this.SshAuthorizedKeys
+            SshImportId = Serialization.serializableSeq this.SshImportId }
+
 type CloudConfig =
     { Apt: Apt option
       FinalMessage: string option
@@ -98,6 +162,7 @@ type CloudConfig =
       PackageUpgrade: bool option
       PackageRebootIfRequired: bool option
       RunCmd: RunCmd option
+      Users: User seq
       WriteFiles: WriteFile seq }
 
     static member Default =
@@ -108,21 +173,20 @@ type CloudConfig =
           PackageUpgrade = None
           PackageRebootIfRequired = None
           RunCmd = None
+          Users = []
           WriteFiles = [] }
 
     member this.ConfigModel =
         {| Apt = this.Apt |> Option.defaultValue Unchecked.defaultof<Apt>
            FinalMessage = this.FinalMessage |> Option.toObj
-           Packages =
-            if this.Packages |> Seq.isEmpty then
-                null
-            else
-                this.Packages |> Seq.map (fun p -> p.Model)
+           Packages = this.Packages |> Seq.map (fun p -> p.Model) |> Serialization.serializableSeq
            PackageUpdate = this.PackageUpdate |> Option.toNullable
            PackageUpgrade = this.PackageUpgrade |> Option.toNullable
            Runcmd = this.RunCmd |> Option.map (fun runCmd -> runCmd.Model) |> Option.toObj
-           WriteFiles =
-            if this.WriteFiles |> Seq.isEmpty then
-                null
-            else
-                this.WriteFiles |}
+           Users =
+               let users = 
+                   this.Users |> Seq.map (fun u -> box u.Model) |> Serialization.serializableSeq
+               if not <| isNull users then // Include the default user created by the cloud platform
+                   users.Insert(0, "default")
+               users
+           WriteFiles = this.WriteFiles |> Serialization.serializableSeq |}

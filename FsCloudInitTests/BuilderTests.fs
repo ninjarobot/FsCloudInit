@@ -125,4 +125,19 @@ let tests =
               }
               |> Writer.write
               |> matchExpectedAt "run-command.yaml"
+          }
+          test "Create users" {
+              cloudConfig {
+                  users [
+                      user {
+                          name "itme"
+                          gecos "My Account"
+                          ssh_import_github_id "mygithubusername"
+                          groups [ "sudo" ]
+                          sudo Sudo.AllPermsNoPasswd
+                      }
+                  ]
+              }
+              |> Writer.write
+              |> matchExpectedAt "users.yaml"
           } ]

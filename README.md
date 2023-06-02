@@ -212,3 +212,19 @@ cloudConfig {
 }
 |> Writer.write
 ```
+
+#### Create additional users
+
+```f#
+cloudConfig {
+    users [
+        user {
+            name "itme"
+            gecos "My Account"
+            ssh_import_github_id "mygithubusername"
+            groups [ "sudo" ]
+            sudo Sudo.AllPermsNoPasswd
+        }
+    ]
+}
+```
