@@ -102,6 +102,15 @@ module Builders =
 
     let aptSource = AptSourceBuilder()
 
+    type UbuntuAdvantageBuilder() =
+        member _.Yield _ = UbuntuAdvantage.Default
+
+        [<CustomOperation "token">]
+        member _.Token(ubuntuAdvantage, token) = { ubuntuAdvantage with Token = token }
+
+    let ubuntuAdvantage = UbuntuAdvantageBuilder()
+    let ubuntuPro = ubuntuAdvantage
+    
     /// Builder for a User.
     type UserBuilder() =
         member _.Yield _ = User.Default
@@ -247,6 +256,13 @@ module Builders =
                     | None -> cmdList
                     |> RunCmd
                     |> Some }
+
+        [<CustomOperation "attach_ubuntu_pro">]
+        member _.AttachUbuntuPro(cloudConfig: CloudConfig, ubuntuAdvantage: UbuntuAdvantage) =
+            {
+                cloudConfig with
+                    UbuntuAdvantage = Some ubuntuAdvantage
+            }
 
         [<CustomOperation "users">]
         member _.Users(cloudConfig: CloudConfig, users: User seq) =

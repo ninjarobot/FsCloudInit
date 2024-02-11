@@ -54,7 +54,7 @@ let tests =
                       )
                       |> Some
                   PackageUpdate = Some true
-                  Packages = [ Package "apt-transport-https"; Package "dotnet-sdk-6.0" ] }
+                  Packages = [ Package "apt-transport-https"; Package "dotnet-sdk-8.0" ] }
               |> Writer.write
               |> matchExpectedAt "apt-source.yaml"
           }
@@ -85,7 +85,7 @@ let tests =
                   PackageUpdate = Some true
                   Packages =
                       [ Package "apt-transport-https"
-                        PackageVersion(PackageName = "dotnet-sdk-6.0", PackageVersion = "6.0.100-1") ] }
+                        PackageVersion(PackageName = "dotnet-sdk-8.0", PackageVersion = "8.0.101-1") ] }
               |> Writer.write
               |> matchExpectedAt "package-specific.yaml"
           }

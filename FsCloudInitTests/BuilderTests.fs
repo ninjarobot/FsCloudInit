@@ -106,7 +106,7 @@ let tests =
 
                   add_packages
                       [ Package "apt-transport-https"
-                        PackageVersion(PackageName = "dotnet-sdk-6.0", PackageVersion = "6.0.100-1") ]
+                        PackageVersion(PackageName = "dotnet-sdk-8.0", PackageVersion = "8.0.101-1") ]
               }
               |> Writer.write
               |> matchExpectedAt "package-specific.yaml"
@@ -140,4 +140,15 @@ let tests =
               }
               |> Writer.write
               |> matchExpectedAt "users.yaml"
+          }
+          test "Ubuntu Pro" {
+              cloudConfig {
+                  attach_ubuntu_pro (
+                      ubuntuPro {
+                          token "d6cec6a05314b7c63f251e2c0e238830"
+                      }
+                  )
+              }
+              |> Writer.write
+              |> matchExpectedAt "ubuntu-pro.yaml"
           } ]

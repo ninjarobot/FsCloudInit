@@ -1,0 +1,4 @@
+#cloud-config
+ubuntu_advantage:
+  token: d6cec6a05314b7c63f251e2c0e238830
+  enable: []

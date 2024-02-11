@@ -101,6 +101,12 @@ type RunCmd =
         match this with
         | RunCmd commands -> commands |> Seq.map Seq.ofList
 
+type UbuntuAdvantage =
+    { Token: string
+      Enable: string seq }
+
+    static member Default = { Token = null; Enable = [] }
+
 type User =
     { Name: string
       ExpiredDate: string
@@ -162,6 +168,7 @@ type CloudConfig =
       PackageUpgrade: bool option
       PackageRebootIfRequired: bool option
       RunCmd: RunCmd option
+      UbuntuAdvantage: UbuntuAdvantage option
       Users: User seq
       WriteFiles: WriteFile seq }
 
@@ -173,6 +180,7 @@ type CloudConfig =
           PackageUpgrade = None
           PackageRebootIfRequired = None
           RunCmd = None
+          UbuntuAdvantage = None
           Users = []
           WriteFiles = [] }
 
@@ -183,10 +191,13 @@ type CloudConfig =
            PackageUpdate = this.PackageUpdate |> Option.toNullable
            PackageUpgrade = this.PackageUpgrade |> Option.toNullable
            Runcmd = this.RunCmd |> Option.map (fun runCmd -> runCmd.Model) |> Option.toObj
+           UbuntuAdvantage = this.UbuntuAdvantage |> Option.defaultValue Unchecked.defaultof<UbuntuAdvantage>
            Users =
-               let users = 
-                   this.Users |> Seq.map (fun u -> box u.Model) |> Serialization.serializableSeq
-               if not <| isNull users then // Include the default user created by the cloud platform
-                   users.Insert(0, "default")
-               users
+            let users =
+                this.Users |> Seq.map (fun u -> box u.Model) |> Serialization.serializableSeq
+
+            if not <| isNull users then // Include the default user created by the cloud platform
+                users.Insert(0, "default")
+
+            users
            WriteFiles = this.WriteFiles |> Serialization.serializableSeq |}

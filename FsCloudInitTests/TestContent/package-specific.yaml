@@ -44,5 +44,5 @@ apt:
 package_update: true
 packages:
 - apt-transport-https
-- - dotnet-sdk-6.0
-  - 6.0.100-1
+- - dotnet-sdk-8.0
+  - 8.0.101-1
