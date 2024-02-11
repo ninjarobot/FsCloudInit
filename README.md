@@ -213,6 +213,18 @@ cloudConfig {
 |> Writer.write
 ```
 
+#### Attach to Ubuntu Pro Subscription
+
+```f#
+cloudConfig {
+    attach_ubuntu_pro (
+        ubuntuPro {
+            token "d6cec6a05314b7c63f251e2c0e238830"
+        }
+    )
+}
+```
+
 #### Create additional users
 
 ```f#
