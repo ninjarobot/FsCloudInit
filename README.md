@@ -213,6 +213,19 @@ cloudConfig {
 |> Writer.write
 ```
 
+#### Reboot after initialized
+
+```f#
+cloudConfig { 
+    power_state (
+        powerState {
+            mode PowerState.Mode.Reboot
+            message "Done with installation. Rebooting now."
+        }
+    )
+}
+```
+
 #### Attach to Ubuntu Pro Subscription
 
 ```f#

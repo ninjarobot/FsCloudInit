@@ -116,6 +116,18 @@ let tests =
               |> Writer.write
               |> matchExpectedAt "final-message.yaml"
           }
+          test "Set power state to reboot" {
+              cloudConfig { 
+                  power_state (
+                      powerState {
+                          mode PowerState.Mode.Reboot
+                          message "Done with installation. Rebooting now."
+                      }
+                  )
+              }
+              |> Writer.write
+              |> matchExpectedAt "power-state.yaml"
+          }
           test "Run commands with cloudConfig builder" {
               cloudConfig {
                   run_commands

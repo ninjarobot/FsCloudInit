@@ -102,6 +102,26 @@ module Builders =
 
     let aptSource = AptSourceBuilder()
 
+    type PowerStateBuilder() =
+        member _.Yield _ = PowerState.Default
+
+        [<CustomOperation "delay">]
+        member _.DelayStateChange(powerState, delay) = { powerState with Delay = delay }
+
+        [<CustomOperation "mode">]
+        member _.Mode(powerState, mode) = { powerState with Mode = mode }
+
+        [<CustomOperation "message">]
+        member _.Message(powerState, message) = { powerState with Message = message }
+
+        [<CustomOperation "timeout">]
+        member _.Timeout(powerState, timeout) = { powerState with Timeout = timeout }
+
+        [<CustomOperation "condition">]
+        member _.Condition(powerState, condition) = { powerState with Condition = condition }
+
+    let powerState = PowerStateBuilder()
+
     type UbuntuAdvantageBuilder() =
         member _.Yield _ = UbuntuAdvantage.Default
 
@@ -244,6 +264,10 @@ module Builders =
         member _.FinalMessage(cloudConfig: CloudConfig, message: string) =
             { cloudConfig with
                 FinalMessage = Some message }
+
+        [<CustomOperation "power_state">]
+        member _.PowerState(cloudConfig: CloudConfig, powerState: PowerState) =
+            { cloudConfig with PowerState = Some powerState }
 
         [<CustomOperation "run_commands">]
         member _.RunCommands(cloudConfig: CloudConfig, commands: string seq seq) =

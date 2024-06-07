@@ -1,0 +1,4 @@
+#cloud-config
+power_state:
+  mode: reboot
+  message: Done with installation. Rebooting now.

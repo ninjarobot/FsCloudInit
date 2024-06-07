@@ -101,6 +101,31 @@ type RunCmd =
         match this with
         | RunCmd commands -> commands |> Seq.map Seq.ofList
 
+type PowerState =
+    { Delay: int
+      Mode: string
+      Message: string
+      Timeout: Nullable<int>
+      Condition: string }
+    
+    static member Default =
+        { Delay = 0
+          Mode = null
+          Message = null
+          Timeout = Nullable()
+          Condition = null }
+
+module PowerState =
+
+    module Mode =
+        [<Literal>]
+        let PowerOff = "powerooff"
+        [<Literal>]
+        let Reboot = "reboot"
+        [<Literal>]
+        let Halt = "halt"
+
+
 type UbuntuAdvantage =
     { Token: string
       Enable: string seq }
@@ -167,6 +192,7 @@ type CloudConfig =
       PackageUpdate: bool option
       PackageUpgrade: bool option
       PackageRebootIfRequired: bool option
+      PowerState: PowerState option
       RunCmd: RunCmd option
       UbuntuAdvantage: UbuntuAdvantage option
       Users: User seq
@@ -179,6 +205,7 @@ type CloudConfig =
           PackageUpdate = None
           PackageUpgrade = None
           PackageRebootIfRequired = None
+          PowerState = None
           RunCmd = None
           UbuntuAdvantage = None
           Users = []
@@ -190,6 +217,7 @@ type CloudConfig =
            Packages = this.Packages |> Seq.map (fun p -> p.Model) |> Serialization.serializableSeq
            PackageUpdate = this.PackageUpdate |> Option.toNullable
            PackageUpgrade = this.PackageUpgrade |> Option.toNullable
+           PowerState = this.PowerState |> Option.defaultValue Unchecked.defaultof<PowerState>
            Runcmd = this.RunCmd |> Option.map (fun runCmd -> runCmd.Model) |> Option.toObj
            UbuntuAdvantage = this.UbuntuAdvantage |> Option.defaultValue Unchecked.defaultof<UbuntuAdvantage>
            Users =
