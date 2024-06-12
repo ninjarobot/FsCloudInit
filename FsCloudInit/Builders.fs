@@ -122,13 +122,23 @@ module Builders =
 
     let powerState = PowerStateBuilder()
 
-    type UbuntuAdvantageBuilder() =
-        member _.Yield _ = UbuntuAdvantage.Default
+    type UbuntuProBuilder() =
+        member _.Yield _ = UbuntuPro.Default
 
         [<CustomOperation "token">]
-        member _.Token(ubuntuAdvantage, token) = { ubuntuAdvantage with Token = token }
+        member _.Token(ubuntuPro, token) = { ubuntuPro with Token = token }
+        [<CustomOperation "enable">]
+        member _.Enable(ubuntuPro, service) =
+            { ubuntuPro with Enable = Set.add service (Set.ofSeq ubuntuPro.Enable) }
+        member _.Enable(ubuntuPro, services) =
+            { ubuntuPro with Enable = Set.union (Set.ofSeq services) (Set.ofSeq ubuntuPro.Enable) }
+        [<CustomOperation "enable_beta">]
+        member _.EnableBeta(ubuntuPro, service) =
+            { ubuntuPro with EnableBeta = Set.add service (Set.ofSeq ubuntuPro.EnableBeta) }
+        member _.EnableBeta(ubuntuPro, services) =
+            { ubuntuPro with EnableBeta = Set.union (Set.ofSeq services) (Set.ofSeq ubuntuPro.EnableBeta) }
 
-    let ubuntuAdvantage = UbuntuAdvantageBuilder()
+    let ubuntuAdvantage = UbuntuProBuilder()
     let ubuntuPro = ubuntuAdvantage
     
     /// Builder for a User.
@@ -282,10 +292,10 @@ module Builders =
                     |> Some }
 
         [<CustomOperation "attach_ubuntu_pro">]
-        member _.AttachUbuntuPro(cloudConfig: CloudConfig, ubuntuAdvantage: UbuntuAdvantage) =
+        member _.AttachUbuntuPro(cloudConfig: CloudConfig, ubuntuPro: UbuntuPro) =
             {
                 cloudConfig with
-                    UbuntuAdvantage = Some ubuntuAdvantage
+                    UbuntuPro = Some ubuntuPro
             }
 
         [<CustomOperation "users">]

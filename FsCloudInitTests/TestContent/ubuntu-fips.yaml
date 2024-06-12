@@ -1,4 +1,7 @@
 #cloud-config
+power_state:
+  mode: reboot
+  message: Rebooting to enable FIPS kernel.
 ubuntu_pro:
   token: d6cec6a05314b7c63f251e2c0e238830
   enable:

@@ -45,7 +45,7 @@ module Sudo =
 
 module internal Serialization =
     let serializableSeq sequence =
-        if Seq.isEmpty sequence then null else ResizeArray sequence
+        if isNull sequence || Seq.isEmpty sequence then null else ResizeArray sequence
 
     let defaultIfTrue b = if b then Unchecked.defaultof<_> else b
 
@@ -126,11 +126,37 @@ module PowerState =
         let Halt = "halt"
 
 
-type UbuntuAdvantage =
+type UbuntuPro =
     { Token: string
-      Enable: string seq }
+      Enable: string seq
+      EnableBeta: string seq }
 
-    static member Default = { Token = null; Enable = [] }
+    static member Default = { Token = null; Enable = []; EnableBeta = [] }
+
+    [<YamlIgnore>]
+    member this.Model =
+        { Token = this.Token
+          Enable = Serialization.serializableSeq this.Enable
+          EnableBeta = Serialization.serializableSeq this.EnableBeta }
+
+module UbuntuPro =
+    module Services =
+        [<Literal>]
+        let CcEal = "cc-eal"
+        [<Literal>]
+        let Cis = "cis"
+        [<Literal>]
+        let EsmApps = "esm-apps"
+        [<Literal>]
+        let EsmInfra = "esm-infra"
+        [<Literal>]
+        let Fips = "fips"
+        [<Literal>]
+        let FipsPreview = "fips-preview"
+        [<Literal>]
+        let FipsUpdates = "fips-updates"
+        [<Literal>]
+        let Livepatch = "livepatch"
 
 type User =
     { Name: string
@@ -194,7 +220,7 @@ type CloudConfig =
       PackageRebootIfRequired: bool option
       PowerState: PowerState option
       RunCmd: RunCmd option
-      UbuntuAdvantage: UbuntuAdvantage option
+      UbuntuPro: UbuntuPro option
       Users: User seq
       WriteFiles: WriteFile seq }
 
@@ -207,7 +233,7 @@ type CloudConfig =
           PackageRebootIfRequired = None
           PowerState = None
           RunCmd = None
-          UbuntuAdvantage = None
+          UbuntuPro = None
           Users = []
           WriteFiles = [] }
 
@@ -219,7 +245,7 @@ type CloudConfig =
            PackageUpgrade = this.PackageUpgrade |> Option.toNullable
            PowerState = this.PowerState |> Option.defaultValue Unchecked.defaultof<PowerState>
            Runcmd = this.RunCmd |> Option.map (fun runCmd -> runCmd.Model) |> Option.toObj
-           UbuntuAdvantage = this.UbuntuAdvantage |> Option.defaultValue Unchecked.defaultof<UbuntuAdvantage>
+           UbuntuPro = this.UbuntuPro |> Option.map (fun u -> u.Model) |> Option.defaultValue Unchecked.defaultof<_>
            Users =
             let users =
                 this.Users |> Seq.map (fun u -> box u.Model) |> Serialization.serializableSeq

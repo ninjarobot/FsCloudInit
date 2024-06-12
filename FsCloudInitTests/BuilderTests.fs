@@ -158,9 +158,36 @@ let tests =
                   attach_ubuntu_pro (
                       ubuntuPro {
                           token "d6cec6a05314b7c63f251e2c0e238830"
+                          enable [
+                              UbuntuPro.Services.FipsPreview
+                              UbuntuPro.Services.EsmApps
+                              UbuntuPro.Services.EsmInfra
+                          ]
                       }
                   )
               }
               |> Writer.write
               |> matchExpectedAt "ubuntu-pro.yaml"
+          }
+          test "Ubuntu Pro - FIPS" {
+              cloudConfig {
+                  attach_ubuntu_pro (
+                      ubuntuPro {
+                          token "d6cec6a05314b7c63f251e2c0e238830"
+                          enable [
+                              UbuntuPro.Services.FipsPreview
+                              UbuntuPro.Services.EsmApps
+                              UbuntuPro.Services.EsmInfra
+                          ]
+                      }
+                  )
+                  power_state (
+                      powerState {
+                          mode PowerState.Mode.Reboot
+                          message "Rebooting to enable FIPS kernel."
+                      }
+                    )
+              }
+              |> Writer.write
+              |> matchExpectedAt "ubuntu-fips.yaml"
           } ]
