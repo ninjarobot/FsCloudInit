@@ -5,7 +5,7 @@ apt:
       key: >
         -----BEGIN PGP PUBLIC KEY BLOCK-----
 
-        Version: GnuPG v1.4.7 (GNU/Linux)
+        Version: BSN Pgp v1.1.0.0
 
 
         mQENBFYxWIwBCADAKoZhZlJxGNGWzqV+1OG1xiQeoowKhssGAKvd+buXCGISZJwT
