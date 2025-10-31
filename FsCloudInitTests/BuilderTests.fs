@@ -206,4 +206,49 @@ let tests =
               }
               |> Writer.write
               |> matchExpectedAt "ubuntu-fips.yaml"
+          }
+          test "Snap with command list" {
+              cloudConfig {
+                  snap (
+                      snapConfig {
+                          add_commands [
+                              [ "install"; "vlc" ]
+                              [ "install"; "hello-world" ]
+                          ]
+                      }
+                  )
+              }
+              |> Writer.write
+              |> matchExpectedAt "snap-basic.yaml"
+          }
+          test "Snap with string commands" {
+              cloudConfig {
+                  snap (
+                      snapConfig {
+                          add_commands [
+                              "snap install vlc"
+                              "snap refresh"
+                          ]
+                      }
+                  )
+              }
+              |> Writer.write
+              |> matchExpectedAt "snap-with-strings.yaml"
+          }
+          test "Snap with assertions and commands" {
+              cloudConfig {
+                  snap (
+                      snapConfig {
+                          add_assertions [
+                              "signed_assertion_blob_1"
+                              "signed_assertion_blob_2"
+                          ]
+                          add_commands [
+                              [ "install"; "canonical-livepatch" ]
+                          ]
+                      }
+                  )
+              }
+              |> Writer.write
+              |> matchExpectedAt "snap-with-assertions.yaml"
           } ]

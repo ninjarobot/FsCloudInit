@@ -1,0 +1,8 @@
+#cloud-config
+snap:
+  assertions:
+  - signed_assertion_blob_1
+  - signed_assertion_blob_2
+  commands:
+  - - install
+    - canonical-livepatch

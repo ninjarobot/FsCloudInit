@@ -117,6 +117,31 @@ type RunCmd =
         match this with
         | RunCmd commands -> commands |> Seq.map Seq.ofList
 
+type SnapCommand =
+    | SnapCommand of Cmd
+    | SnapCommandString of string
+
+    member this.Model =
+        match this with
+        | SnapCommand cmd -> cmd |> ResizeArray |> box
+        | SnapCommandString str -> box str
+
+type SnapConfig =
+    { Commands: SnapCommand seq
+      Assertions: string seq }
+
+    static member Default =
+        { Commands = []
+          Assertions = [] }
+
+    [<YamlIgnore>]
+    member this.Model =
+        {| Commands =
+            this.Commands
+            |> Seq.map (fun cmd -> cmd.Model)
+            |> Serialization.serializableSeq
+           Assertions = Serialization.serializableSeq this.Assertions |}
+
 type PowerState =
     { Delay: int
       Mode: string
@@ -236,6 +261,7 @@ type CloudConfig =
       PackageRebootIfRequired: bool option
       PowerState: PowerState option
       RunCmd: RunCmd option
+      Snap: SnapConfig option
       UbuntuPro: UbuntuPro option
       Users: User seq
       WriteFiles: WriteFile seq }
@@ -249,6 +275,7 @@ type CloudConfig =
           PackageRebootIfRequired = None
           PowerState = None
           RunCmd = None
+          Snap = None
           UbuntuPro = None
           Users = []
           WriteFiles = [] }
@@ -261,6 +288,7 @@ type CloudConfig =
            PackageUpgrade = this.PackageUpgrade |> Option.toNullable
            PowerState = this.PowerState |> Option.defaultValue Unchecked.defaultof<PowerState>
            Runcmd = this.RunCmd |> Option.map (fun runCmd -> runCmd.Model) |> Option.toObj
+           Snap = this.Snap |> Option.map (fun s -> s.Model) |> Option.defaultValue Unchecked.defaultof<_>
            UbuntuPro = this.UbuntuPro |> Option.map (fun u -> u.Model) |> Option.defaultValue Unchecked.defaultof<_>
            Users =
             let users =

@@ -1,0 +1,5 @@
+#cloud-config
+snap:
+  commands:
+  - snap install vlc
+  - snap refresh
