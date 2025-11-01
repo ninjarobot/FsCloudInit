@@ -138,6 +138,24 @@ module Builders =
 
     let powerState = PowerStateBuilder()
 
+    type SnapBuilder() =
+        member _.Yield _ = SnapConfig.Default
+
+        [<CustomOperation "add_commands">]
+        member _.AddCommands(snapConfig, commands: Cmd seq) =
+            let newCommands = commands |> Seq.map SnapCommand
+            { snapConfig with Commands = Seq.append snapConfig.Commands newCommands }
+
+        member _.AddCommands(snapConfig, commands: string seq) =
+            let newCommands = commands |> Seq.map SnapCommandString
+            { snapConfig with Commands = Seq.append snapConfig.Commands newCommands }
+
+        [<CustomOperation "add_assertions">]
+        member _.AddAssertions(snapConfig, assertions: string seq) =
+            { snapConfig with Assertions = Seq.append snapConfig.Assertions assertions }
+
+    let snapConfig = SnapBuilder()
+
     type UbuntuProBuilder() =
         member _.Yield _ = UbuntuPro.Default
 
@@ -306,6 +324,10 @@ module Builders =
                     | None -> cmdList
                     |> RunCmd
                     |> Some }
+
+        [<CustomOperation "snap">]
+        member _.Snap(cloudConfig: CloudConfig, snapConfig: SnapConfig) =
+            { cloudConfig with Snap = Some snapConfig }
 
         [<CustomOperation "attach_ubuntu_pro">]
         member _.AttachUbuntuPro(cloudConfig: CloudConfig, ubuntuPro: UbuntuPro) =

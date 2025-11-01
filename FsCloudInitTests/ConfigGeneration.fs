@@ -220,4 +220,26 @@ let tests =
                   FinalMessage = Some "#### Cloud-init is done! ####" }
               |> Writer.write
               |> matchExpectedAt "final-message.yaml"
+          }
+          test "Snap with commands record" {
+              { CloudConfig.Default with
+                  Snap =
+                      { SnapConfig.Default with
+                          Commands =
+                              [ SnapCommand [ "install"; "vlc" ]
+                                SnapCommand [ "install"; "hello-world" ] ] }
+                      |> Some }
+              |> Writer.write
+              |> matchExpectedAt "snap-basic.yaml"
+          }
+          test "Snap with string commands record" {
+              { CloudConfig.Default with
+                  Snap =
+                      { SnapConfig.Default with
+                          Commands =
+                              [ SnapCommandString "snap install vlc"
+                                SnapCommandString "snap refresh" ] }
+                      |> Some }
+              |> Writer.write
+              |> matchExpectedAt "snap-with-strings.yaml"
           } ]

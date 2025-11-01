@@ -1,0 +1,7 @@
+#cloud-config
+snap:
+  commands:
+  - - install
+    - vlc
+  - - install
+    - hello-world
