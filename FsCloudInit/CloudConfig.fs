@@ -99,6 +99,46 @@ type AptSource =
 type Apt() =
     member val Sources = Unchecked.defaultof<IDictionary<string, AptSource>> with get, set
 
+type YumRepo =
+    { [<YamlMember(Alias = "name")>]
+      RepoName: string
+      [<YamlMember(Alias = "baseurl")>]
+      BaseUrl: string
+      [<YamlMember(Alias = "metalink")>]
+      Metalink: string
+      [<YamlMember(Alias = "mirrorlist")>]
+      MirrorList: string
+      [<YamlMember(Alias = "enabled")>]
+      Enabled: Nullable<bool>
+      [<YamlMember(Alias = "failovermethod")>]
+      FailoverMethod: string
+      [<YamlMember(Alias = "gpgcheck")>]
+      GpgCheck: Nullable<bool>
+      [<YamlMember(Alias = "gpgkey")>]
+      GpgKey: string
+      [<YamlMember(Alias = "metadata_expire")>]
+      MetadataExpire: Nullable<int>
+      [<YamlMember(Alias = "ssladvertised")>]
+      SslAdvertised: Nullable<bool>
+      [<YamlMember(Alias = "sslverify")>]
+      SslVerify: Nullable<bool>
+      [<YamlMember(Alias = "description")>]
+      Description: string }
+
+    static member Default =
+        { RepoName = null
+          BaseUrl = null
+          Metalink = null
+          MirrorList = null
+          Enabled = Nullable()
+          FailoverMethod = null
+          GpgCheck = Nullable()
+          GpgKey = null
+          MetadataExpire = Nullable()
+          SslAdvertised = Nullable()
+          SslVerify = Nullable()
+          Description = null }
+
 type Package =
     | Package of string
     | PackageVersion of PackageName: string * PackageVersion: string
@@ -262,6 +302,7 @@ type CloudConfig =
       PowerState: PowerState option
       RunCmd: RunCmd option
       Snap: SnapConfig option
+      YumRepos: IDictionary<string, YumRepo> option
       UbuntuPro: UbuntuPro option
       Users: User seq
       WriteFiles: WriteFile seq }
@@ -276,6 +317,7 @@ type CloudConfig =
           PowerState = None
           RunCmd = None
           Snap = None
+          YumRepos = None
           UbuntuPro = None
           Users = []
           WriteFiles = [] }
@@ -289,6 +331,7 @@ type CloudConfig =
            PowerState = this.PowerState |> Option.defaultValue Unchecked.defaultof<PowerState>
            Runcmd = this.RunCmd |> Option.map (fun runCmd -> runCmd.Model) |> Option.toObj
            Snap = this.Snap |> Option.map (fun s -> s.Model) |> Option.defaultValue Unchecked.defaultof<_>
+           YumRepos = this.YumRepos |> Option.defaultValue Unchecked.defaultof<IDictionary<string, YumRepo>>
            UbuntuPro = this.UbuntuPro |> Option.map (fun u -> u.Model) |> Option.defaultValue Unchecked.defaultof<_>
            Users =
             let users =

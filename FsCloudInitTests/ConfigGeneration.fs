@@ -105,6 +105,24 @@ let tests =
               |> Writer.write
               |> matchExpectedAt "package-specific.yaml"
           }
+          test "Generates yum repositories" {
+              { CloudConfig.Default with
+                  YumRepos =
+                      dict
+                          [ "my-custom-repo",
+                            { YumRepo.Default with
+                                RepoName = "Extra Packages for Enterprise Linux 5 - Testing"
+                                BaseUrl = "http://download.fedoraproject.org/pub/epel/testing/5/$basearch"
+                                Enabled = Nullable true
+                                FailoverMethod = "priority"
+                                GpgCheck = Nullable true
+                                GpgKey = "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL"
+                                MetadataExpire = Nullable 3600
+                                SslVerify = Nullable false } ]
+                      |> Some }
+              |> Writer.write
+              |> matchExpectedAt "yum-repos.yaml"
+          }
           test "Embed file" {
               let content = "hello world"
 

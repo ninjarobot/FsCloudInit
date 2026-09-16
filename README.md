@@ -142,6 +142,47 @@ packages:
     - 6.0.100-1
 ```
 
+#### Add yum repositories
+
+Use `add_yum_repos` to configure repositories for RHEL-family distributions.
+`name` sets the repository key under `yum_repos`, while `repo_name` sets the
+display name written to the nested `name:` field.
+
+```f#
+cloudConfig {
+    add_yum_repos [
+        yumRepo {
+            name "epel-testing"
+            repo_name "Extra Packages for Enterprise Linux 5 - Testing"
+            baseurl "http://download.fedoraproject.org/pub/epel/testing/5/$basearch"
+            enabled true
+            failovermethod "priority"
+            gpgcheck true
+            gpgkey "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL"
+            metadata_expire 3600
+            sslverify false
+        }
+    ]
+}
+|> Writer.write
+```
+
+This produces:
+
+```yaml
+#cloud-config
+yum_repos:
+  epel-testing:
+    name: Extra Packages for Enterprise Linux 5 - Testing
+    baseurl: http://download.fedoraproject.org/pub/epel/testing/5/$basearch
+    enabled: true
+    failovermethod: priority
+    gpgcheck: true
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL
+    metadata_expire: 3600
+    sslverify: false
+```
+
 
 #### Write files
 

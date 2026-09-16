@@ -118,6 +118,82 @@ module Builders =
 
     let aptSource = AptSourceBuilder()
 
+    type YumRepoConfig =
+        { Name: string
+          Repo: YumRepo }
+
+        static member Default =
+            { Name = ""
+              Repo = YumRepo.Default }
+
+    type YumRepoBuilder() =
+        member _.Yield _ = YumRepoConfig.Default
+
+        [<CustomOperation "name">]
+        member _.Name(yumRepo: YumRepoConfig, name: string) = { yumRepo with Name = name }
+
+        [<CustomOperation "repo_name">]
+        member _.RepoName(yumRepo: YumRepoConfig, repoName: string) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with RepoName = repoName } }
+
+        [<CustomOperation "baseurl">]
+        member _.BaseUrl(yumRepo: YumRepoConfig, baseUrl: string) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with BaseUrl = baseUrl } }
+
+        [<CustomOperation "metalink">]
+        member _.Metalink(yumRepo: YumRepoConfig, metalink: string) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with Metalink = metalink } }
+
+        [<CustomOperation "mirrorlist">]
+        member _.MirrorList(yumRepo: YumRepoConfig, mirrorList: string) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with MirrorList = mirrorList } }
+
+        [<CustomOperation "enabled">]
+        member _.Enabled(yumRepo: YumRepoConfig, enabled: bool) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with Enabled = Nullable enabled } }
+
+        [<CustomOperation "failovermethod">]
+        member _.FailoverMethod(yumRepo: YumRepoConfig, failoverMethod: string) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with FailoverMethod = failoverMethod } }
+
+        [<CustomOperation "gpgcheck">]
+        member _.GpgCheck(yumRepo: YumRepoConfig, gpgCheck: bool) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with GpgCheck = Nullable gpgCheck } }
+
+        [<CustomOperation "gpgkey">]
+        member _.GpgKey(yumRepo: YumRepoConfig, gpgKey: string) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with GpgKey = gpgKey } }
+
+        [<CustomOperation "metadata_expire">]
+        member _.MetadataExpire(yumRepo: YumRepoConfig, metadataExpire: int) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with MetadataExpire = Nullable metadataExpire } }
+
+        [<CustomOperation "ssladvertised">]
+        member _.SslAdvertised(yumRepo: YumRepoConfig, sslAdvertised: bool) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with SslAdvertised = Nullable sslAdvertised } }
+
+        [<CustomOperation "sslverify">]
+        member _.SslVerify(yumRepo: YumRepoConfig, sslVerify: bool) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with SslVerify = Nullable sslVerify } }
+
+        [<CustomOperation "description">]
+        member _.Description(yumRepo: YumRepoConfig, description: string) =
+            { yumRepo with
+                Repo = { yumRepo.Repo with Description = description } }
+
+    let yumRepo = YumRepoBuilder()
+
     type PowerStateBuilder() =
         member _.Yield _ = PowerState.Default
 
@@ -282,6 +358,20 @@ module Builders =
 
                 { cloudConfig with
                     Apt = Some(Apt(Sources = sources)) }
+
+        [<CustomOperation "add_yum_repos">]
+        member _.YumRepos(cloudConfig: CloudConfig, yumRepos: YumRepoConfig seq) =
+            match cloudConfig.YumRepos with
+            | Some repos ->
+                for repo in yumRepos do
+                    repos.[repo.Name] <- repo.Repo
+
+                cloudConfig
+            | None ->
+                let repos = yumRepos |> Seq.map (fun repo -> repo.Name, repo.Repo) |> dict
+
+                { cloudConfig with
+                    YumRepos = Some repos }
 
         [<CustomOperation "package_update">]
         member _.PackageUpdate(cloudConfig: CloudConfig, packageUpdate: bool) =
