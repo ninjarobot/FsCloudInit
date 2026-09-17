@@ -123,6 +123,38 @@ let tests =
               |> Writer.write
               |> matchExpectedAt "yum-repos.yaml"
           }
+          test "Generates hostname only" {
+              { CloudConfig.Default with
+                  Hostname = Some "myhost" }
+              |> Writer.write
+              |> matchExpectedAt "hostname.yaml"
+          }
+          test "Generates fqdn only" {
+              { CloudConfig.Default with
+                  Fqdn = Some "myhost.example.com" }
+              |> Writer.write
+              |> matchExpectedAt "fqdn.yaml"
+          }
+          test "Generates hostname and fqdn with preference" {
+              { CloudConfig.Default with
+                  Hostname = Some "myhost"
+                  Fqdn = Some "myhost.example.com"
+                  PreferFqdnOverHostname = Some true }
+              |> Writer.write
+              |> matchExpectedAt "hostname-fqdn.yaml"
+          }
+          test "Generates preserve hostname" {
+              { CloudConfig.Default with
+                  PreserveHostname = Some true }
+              |> Writer.write
+              |> matchExpectedAt "preserve-hostname.yaml"
+          }
+          test "Generates create hostname file disabled" {
+              { CloudConfig.Default with
+                  CreateHostnameFile = Some false }
+              |> Writer.write
+              |> matchExpectedAt "create-hostname-file-disabled.yaml"
+          }
           test "Embed file" {
               let content = "hello world"
 

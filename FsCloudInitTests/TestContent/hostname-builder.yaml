@@ -1,0 +1,6 @@
+#cloud-config
+create_hostname_file: true
+fqdn: myhost.example.com
+hostname: myhost
+prefer_fqdn_over_hostname: true
+preserve_hostname: false

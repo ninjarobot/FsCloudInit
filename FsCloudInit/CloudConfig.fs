@@ -294,11 +294,16 @@ type User =
 
 type CloudConfig =
     { Apt: Apt option
+      CreateHostnameFile: bool option
       FinalMessage: string option
+      Fqdn: string option
+      Hostname: string option
       Packages: Package seq
       PackageUpdate: bool option
       PackageUpgrade: bool option
       PackageRebootIfRequired: bool option
+      PreferFqdnOverHostname: bool option
+      PreserveHostname: bool option
       PowerState: PowerState option
       RunCmd: RunCmd option
       Snap: SnapConfig option
@@ -309,11 +314,16 @@ type CloudConfig =
 
     static member Default =
         { Apt = None
+          CreateHostnameFile = None
           FinalMessage = None
+          Fqdn = None
+          Hostname = None
           Packages = []
           PackageUpdate = None
           PackageUpgrade = None
           PackageRebootIfRequired = None
+          PreferFqdnOverHostname = None
+          PreserveHostname = None
           PowerState = None
           RunCmd = None
           Snap = None
@@ -324,10 +334,15 @@ type CloudConfig =
 
     member this.ConfigModel =
         {| Apt = this.Apt |> Option.defaultValue Unchecked.defaultof<Apt>
+           CreateHostnameFile = this.CreateHostnameFile |> Option.toNullable
            FinalMessage = this.FinalMessage |> Option.toObj
+           Fqdn = this.Fqdn |> Option.toObj
+           Hostname = this.Hostname |> Option.toObj
            Packages = this.Packages |> Seq.map (fun p -> p.Model) |> Serialization.serializableSeq
            PackageUpdate = this.PackageUpdate |> Option.toNullable
            PackageUpgrade = this.PackageUpgrade |> Option.toNullable
+           PreferFqdnOverHostname = this.PreferFqdnOverHostname |> Option.toNullable
+           PreserveHostname = this.PreserveHostname |> Option.toNullable
            PowerState = this.PowerState |> Option.defaultValue Unchecked.defaultof<PowerState>
            Runcmd = this.RunCmd |> Option.map (fun runCmd -> runCmd.Model) |> Option.toObj
            Snap = this.Snap |> Option.map (fun s -> s.Model) |> Option.defaultValue Unchecked.defaultof<_>

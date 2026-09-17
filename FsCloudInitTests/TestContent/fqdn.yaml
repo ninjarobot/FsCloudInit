@@ -1,0 +1,2 @@
+#cloud-config
+fqdn: myhost.example.com
