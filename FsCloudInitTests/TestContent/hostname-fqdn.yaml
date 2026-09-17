@@ -1,0 +1,4 @@
+#cloud-config
+fqdn: myhost.example.com
+hostname: myhost
+prefer_fqdn_over_hostname: true

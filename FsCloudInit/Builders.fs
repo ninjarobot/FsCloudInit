@@ -378,6 +378,26 @@ module Builders =
             { cloudConfig with
                 PackageUpdate = Some packageUpdate }
 
+        [<CustomOperation "hostname">]
+        member _.Hostname(cloudConfig: CloudConfig, hostname: string) =
+            { cloudConfig with Hostname = Some hostname }
+
+        [<CustomOperation "fqdn">]
+        member _.Fqdn(cloudConfig: CloudConfig, fqdn: string) =
+            { cloudConfig with Fqdn = Some fqdn }
+
+        [<CustomOperation "preserve_hostname">]
+        member _.PreserveHostname(cloudConfig: CloudConfig, preserveHostname: bool) =
+            { cloudConfig with PreserveHostname = Some preserveHostname }
+
+        [<CustomOperation "prefer_fqdn_over_hostname">]
+        member _.PreferFqdnOverHostname(cloudConfig: CloudConfig, preferFqdnOverHostname: bool) =
+            { cloudConfig with PreferFqdnOverHostname = Some preferFqdnOverHostname }
+
+        [<CustomOperation "create_hostname_file">]
+        member _.CreateHostnameFile(cloudConfig: CloudConfig, createHostnameFile: bool) =
+            { cloudConfig with CreateHostnameFile = Some createHostnameFile }
+
         [<CustomOperation "package_upgrade">]
         member _.PackageUpgrade(cloudConfig: CloudConfig, packageUpgrade: bool) =
             { cloudConfig with

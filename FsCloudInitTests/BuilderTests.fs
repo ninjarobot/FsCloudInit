@@ -146,6 +146,17 @@ let tests =
               |> Writer.write
               |> matchExpectedAt "yum-repos.yaml"
           }
+          test "Set hostname fields with builder" {
+              cloudConfig {
+                  hostname "myhost"
+                  fqdn "myhost.example.com"
+                  prefer_fqdn_over_hostname true
+                  preserve_hostname false
+                  create_hostname_file true
+              }
+              |> Writer.write
+              |> matchExpectedAt "hostname-builder.yaml"
+          }
           test "Final message with cloudConfig builder" {
               cloudConfig { final_message "#### Cloud-init is done! ####" }
               |> Writer.write

@@ -184,6 +184,41 @@ yum_repos:
 ```
 
 
+#### Configure hostname and FQDN
+
+Use the hostname-related cloud-init keys directly from the builder.
+
+```f#
+cloudConfig {
+    hostname "myhost"
+    fqdn "myhost.example.com"
+    prefer_fqdn_over_hostname true
+    preserve_hostname false
+    create_hostname_file true
+}
+|> Writer.write
+```
+
+This produces:
+
+```yaml
+#cloud-config
+create_hostname_file: true
+fqdn: myhost.example.com
+hostname: myhost
+prefer_fqdn_over_hostname: true
+preserve_hostname: false
+```
+
+If the image or platform should keep controlling the hostname, use:
+
+```f#
+cloudConfig {
+    preserve_hostname true
+}
+|> Writer.write
+```
+
 #### Write files
 
 Write some arbitrary data to a file. It will be base64 encoded automatically so there won't be any character escaping issues.
