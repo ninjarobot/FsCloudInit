@@ -155,6 +155,40 @@ let tests =
               |> Writer.write
               |> matchExpectedAt "create-hostname-file-disabled.yaml"
           }
+          test "Generates top-level SSH config" {
+              { CloudConfig.Default with
+                  SshAuthorizedKeys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAEXAMPLE default@example" ]
+                  SshDeleteKeys = Some true
+                  SshGenKeyTypes = [ "rsa"; "ed25519" ]
+                  DisableRoot = Some true
+                  DisableRootOpts =
+                      Some
+                          "no-port-forwarding,no-agent-forwarding,no-X11-forwarding,command=\"echo 'login as ubuntu';exit 142\""
+                  AllowPublicSshKeys = Some false
+                  SshQuietKeygen = Some true
+                  SshPublishHostKeys =
+                      Some
+                          { SshPublishHostKeys.Default with
+                              Enabled = Nullable true
+                              Blacklist = [ "rsa" ] }
+                  NoSshFingerprints = Some true
+                  AuthKeyHash = Some "sha512" }
+              |> Writer.write
+              |> matchExpectedAt "ssh-config.yaml"
+          }
+          test "Generates top-level SSH host keys" {
+              { CloudConfig.Default with
+                  SshKeys =
+                      Some
+                          { SshKeys.Default with
+                              Ed25519Private = "PRIVATE-ED25519"
+                              Ed25519Public = "PUBLIC-ED25519"
+                              RsaPrivate = "PRIVATE-RSA"
+                              RsaPublic = "PUBLIC-RSA"
+                              RsaCertificate = "CERT-RSA" } }
+              |> Writer.write
+              |> matchExpectedAt "ssh-host-keys.yaml"
+          }
           test "Embed file" {
               let content = "hello world"
 

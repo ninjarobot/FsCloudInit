@@ -1,0 +1,7 @@
+#cloud-config
+ssh_keys:
+  ed25519_private: PRIVATE-ED25519
+  ed25519_public: PUBLIC-ED25519
+  rsa_private: PRIVATE-RSA
+  rsa_public: PUBLIC-RSA
+  rsa_certificate: CERT-RSA
