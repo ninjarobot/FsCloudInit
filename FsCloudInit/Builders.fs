@@ -194,6 +194,60 @@ module Builders =
 
     let yumRepo = YumRepoBuilder()
 
+    type SshKeysBuilder() =
+        member _.Yield _ = SshKeys.Default
+
+        [<CustomOperation "ecdsa_private">]
+        member _.EcdsaPrivate(sshKeys: SshKeys, ecdsaPrivate: string) =
+            { sshKeys with EcdsaPrivate = ecdsaPrivate }
+
+        [<CustomOperation "ecdsa_public">]
+        member _.EcdsaPublic(sshKeys: SshKeys, ecdsaPublic: string) =
+            { sshKeys with EcdsaPublic = ecdsaPublic }
+
+        [<CustomOperation "ecdsa_certificate">]
+        member _.EcdsaCertificate(sshKeys: SshKeys, ecdsaCertificate: string) =
+            { sshKeys with EcdsaCertificate = ecdsaCertificate }
+
+        [<CustomOperation "ed25519_private">]
+        member _.Ed25519Private(sshKeys: SshKeys, ed25519Private: string) =
+            { sshKeys with Ed25519Private = ed25519Private }
+
+        [<CustomOperation "ed25519_public">]
+        member _.Ed25519Public(sshKeys: SshKeys, ed25519Public: string) =
+            { sshKeys with Ed25519Public = ed25519Public }
+
+        [<CustomOperation "ed25519_certificate">]
+        member _.Ed25519Certificate(sshKeys: SshKeys, ed25519Certificate: string) =
+            { sshKeys with Ed25519Certificate = ed25519Certificate }
+
+        [<CustomOperation "rsa_private">]
+        member _.RsaPrivate(sshKeys: SshKeys, rsaPrivate: string) =
+            { sshKeys with RsaPrivate = rsaPrivate }
+
+        [<CustomOperation "rsa_public">]
+        member _.RsaPublic(sshKeys: SshKeys, rsaPublic: string) =
+            { sshKeys with RsaPublic = rsaPublic }
+
+        [<CustomOperation "rsa_certificate">]
+        member _.RsaCertificate(sshKeys: SshKeys, rsaCertificate: string) =
+            { sshKeys with RsaCertificate = rsaCertificate }
+
+    let sshKeys = SshKeysBuilder()
+
+    type SshPublishHostKeysBuilder() =
+        member _.Yield _ = SshPublishHostKeys.Default
+
+        [<CustomOperation "enabled">]
+        member _.Enabled(sshPublishHostKeys: SshPublishHostKeys, enabled: bool) =
+            { sshPublishHostKeys with Enabled = Nullable enabled }
+
+        [<CustomOperation "blacklist">]
+        member _.Blacklist(sshPublishHostKeys: SshPublishHostKeys, blacklist: string seq) =
+            { sshPublishHostKeys with Blacklist = Seq.append sshPublishHostKeys.Blacklist blacklist }
+
+    let sshPublishHostKeys = SshPublishHostKeysBuilder()
+
     type PowerStateBuilder() =
         member _.Yield _ = PowerState.Default
 
@@ -377,6 +431,50 @@ module Builders =
         member _.PackageUpdate(cloudConfig: CloudConfig, packageUpdate: bool) =
             { cloudConfig with
                 PackageUpdate = Some packageUpdate }
+
+        [<CustomOperation "ssh_authorized_keys">]
+        member _.SshAuthorizedKeys(cloudConfig: CloudConfig, sshAuthorizedKeys: string seq) =
+            { cloudConfig with SshAuthorizedKeys = Seq.append cloudConfig.SshAuthorizedKeys sshAuthorizedKeys }
+
+        [<CustomOperation "ssh_deletekeys">]
+        member _.SshDeleteKeys(cloudConfig: CloudConfig, sshDeleteKeys: bool) =
+            { cloudConfig with SshDeleteKeys = Some sshDeleteKeys }
+
+        [<CustomOperation "ssh_genkeytypes">]
+        member _.SshGenKeyTypes(cloudConfig: CloudConfig, sshGenKeyTypes: string seq) =
+            { cloudConfig with SshGenKeyTypes = Seq.append cloudConfig.SshGenKeyTypes sshGenKeyTypes }
+
+        [<CustomOperation "ssh_keys">]
+        member _.SshKeys(cloudConfig: CloudConfig, sshKeys: SshKeys) =
+            { cloudConfig with SshKeys = Some sshKeys }
+
+        [<CustomOperation "disable_root">]
+        member _.DisableRoot(cloudConfig: CloudConfig, disableRoot: bool) =
+            { cloudConfig with DisableRoot = Some disableRoot }
+
+        [<CustomOperation "disable_root_opts">]
+        member _.DisableRootOpts(cloudConfig: CloudConfig, disableRootOpts: string) =
+            { cloudConfig with DisableRootOpts = Some disableRootOpts }
+
+        [<CustomOperation "allow_public_ssh_keys">]
+        member _.AllowPublicSshKeys(cloudConfig: CloudConfig, allowPublicSshKeys: bool) =
+            { cloudConfig with AllowPublicSshKeys = Some allowPublicSshKeys }
+
+        [<CustomOperation "ssh_quiet_keygen">]
+        member _.SshQuietKeygen(cloudConfig: CloudConfig, sshQuietKeygen: bool) =
+            { cloudConfig with SshQuietKeygen = Some sshQuietKeygen }
+
+        [<CustomOperation "ssh_publish_hostkeys">]
+        member _.SshPublishHostKeys(cloudConfig: CloudConfig, sshPublishHostKeys: SshPublishHostKeys) =
+            { cloudConfig with SshPublishHostKeys = Some sshPublishHostKeys }
+
+        [<CustomOperation "no_ssh_fingerprints">]
+        member _.NoSshFingerprints(cloudConfig: CloudConfig, noSshFingerprints: bool) =
+            { cloudConfig with NoSshFingerprints = Some noSshFingerprints }
+
+        [<CustomOperation "authkey_hash">]
+        member _.AuthKeyHash(cloudConfig: CloudConfig, authKeyHash: string) =
+            { cloudConfig with AuthKeyHash = Some authKeyHash }
 
         [<CustomOperation "hostname">]
         member _.Hostname(cloudConfig: CloudConfig, hostname: string) =

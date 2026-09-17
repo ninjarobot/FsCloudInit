@@ -157,6 +157,43 @@ let tests =
               |> Writer.write
               |> matchExpectedAt "hostname-builder.yaml"
           }
+          test "Set top-level SSH fields with builder" {
+              cloudConfig {
+                  ssh_authorized_keys [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAEXAMPLE default@example" ]
+                  ssh_deletekeys true
+                  ssh_genkeytypes [ "rsa"; "ed25519" ]
+                  disable_root true
+                  disable_root_opts
+                      "no-port-forwarding,no-agent-forwarding,no-X11-forwarding,command=\"echo 'login as ubuntu';exit 142\""
+                  allow_public_ssh_keys false
+                  ssh_quiet_keygen true
+                  ssh_publish_hostkeys (
+                      sshPublishHostKeys {
+                          enabled true
+                          blacklist [ "rsa" ]
+                      }
+                  )
+                  no_ssh_fingerprints true
+                  authkey_hash "sha512"
+              }
+              |> Writer.write
+              |> matchExpectedAt "ssh-config.yaml"
+          }
+          test "Set SSH host keys with builder" {
+              cloudConfig {
+                  ssh_keys (
+                      sshKeys {
+                          ed25519_private "PRIVATE-ED25519"
+                          ed25519_public "PUBLIC-ED25519"
+                          rsa_private "PRIVATE-RSA"
+                          rsa_public "PUBLIC-RSA"
+                          rsa_certificate "CERT-RSA"
+                      }
+                  )
+              }
+              |> Writer.write
+              |> matchExpectedAt "ssh-host-keys.yaml"
+          }
           test "Final message with cloudConfig builder" {
               cloudConfig { final_message "#### Cloud-init is done! ####" }
               |> Writer.write
