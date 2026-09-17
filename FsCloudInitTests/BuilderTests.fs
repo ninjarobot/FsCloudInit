@@ -127,6 +127,25 @@ let tests =
               |> Writer.write
               |> matchExpectedAt "package-specific.yaml"
           }
+          test "Add yum repository with builder" {
+              cloudConfig {
+                  add_yum_repos [
+                      yumRepo {
+                          name "my-custom-repo"
+                          repo_name "Extra Packages for Enterprise Linux 5 - Testing"
+                          baseurl "http://download.fedoraproject.org/pub/epel/testing/5/$basearch"
+                          enabled true
+                          failovermethod "priority"
+                          gpgcheck true
+                          gpgkey "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL"
+                          metadata_expire 3600
+                          sslverify false
+                      }
+                  ]
+              }
+              |> Writer.write
+              |> matchExpectedAt "yum-repos.yaml"
+          }
           test "Final message with cloudConfig builder" {
               cloudConfig { final_message "#### Cloud-init is done! ####" }
               |> Writer.write

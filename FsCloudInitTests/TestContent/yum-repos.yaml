@@ -1,0 +1,11 @@
+#cloud-config
+yum_repos:
+  my-custom-repo:
+    name: Extra Packages for Enterprise Linux 5 - Testing
+    baseurl: http://download.fedoraproject.org/pub/epel/testing/5/$basearch
+    enabled: true
+    failovermethod: priority
+    gpgcheck: true
+    gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL
+    metadata_expire: 3600
+    sslverify: false
