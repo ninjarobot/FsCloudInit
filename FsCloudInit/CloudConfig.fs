@@ -220,6 +220,51 @@ type UbuntuPro =
           Enable = Serialization.serializableSeq this.Enable
           EnableBeta = Serialization.serializableSeq this.EnableBeta }
 
+type SshKeys =
+    { EcdsaPrivate: string
+      EcdsaPublic: string
+      EcdsaCertificate: string
+      Ed25519Private: string
+      Ed25519Public: string
+      Ed25519Certificate: string
+      RsaPrivate: string
+      RsaPublic: string
+      RsaCertificate: string }
+
+    static member Default =
+        { EcdsaPrivate = null
+          EcdsaPublic = null
+          EcdsaCertificate = null
+          Ed25519Private = null
+          Ed25519Public = null
+          Ed25519Certificate = null
+          RsaPrivate = null
+          RsaPublic = null
+          RsaCertificate = null }
+
+type SshPublishHostKeys =
+    { Enabled: Nullable<bool>
+      Blacklist: string seq }
+
+    static member Default =
+        { Enabled = Nullable()
+          Blacklist = [] }
+
+    [<YamlIgnore>]
+    member this.Model =
+        { Enabled = this.Enabled
+          Blacklist = Serialization.serializableSeq this.Blacklist }
+
+module SshKeyType =
+    [<Literal>]
+    let Ecdsa = "ecdsa"
+
+    [<Literal>]
+    let Ed25519 = "ed25519"
+
+    [<Literal>]
+    let Rsa = "rsa"
+
 module UbuntuPro =
     module Services =
         [<Literal>]
@@ -294,10 +339,16 @@ type User =
 
 type CloudConfig =
     { Apt: Apt option
+      AllowPublicSshKeys: bool option
+      [<YamlMember(Alias = "authkey_hash")>]
+      AuthKeyHash: string option
       CreateHostnameFile: bool option
+      DisableRoot: bool option
+      DisableRootOpts: string option
       FinalMessage: string option
       Fqdn: string option
       Hostname: string option
+      NoSshFingerprints: bool option
       Packages: Package seq
       PackageUpdate: bool option
       PackageUpgrade: bool option
@@ -307,6 +358,15 @@ type CloudConfig =
       PowerState: PowerState option
       RunCmd: RunCmd option
       Snap: SnapConfig option
+      SshAuthorizedKeys: string seq
+      [<YamlMember(Alias = "ssh_deletekeys")>]
+      SshDeleteKeys: bool option
+      [<YamlMember(Alias = "ssh_genkeytypes")>]
+      SshGenKeyTypes: string seq
+      SshKeys: SshKeys option
+      [<YamlMember(Alias = "ssh_publish_hostkeys")>]
+      SshPublishHostKeys: SshPublishHostKeys option
+      SshQuietKeygen: bool option
       YumRepos: IDictionary<string, YumRepo> option
       UbuntuPro: UbuntuPro option
       Users: User seq
@@ -314,10 +374,15 @@ type CloudConfig =
 
     static member Default =
         { Apt = None
+          AllowPublicSshKeys = None
+          AuthKeyHash = None
           CreateHostnameFile = None
+          DisableRoot = None
+          DisableRootOpts = None
           FinalMessage = None
           Fqdn = None
           Hostname = None
+          NoSshFingerprints = None
           Packages = []
           PackageUpdate = None
           PackageUpgrade = None
@@ -327,6 +392,12 @@ type CloudConfig =
           PowerState = None
           RunCmd = None
           Snap = None
+          SshAuthorizedKeys = []
+          SshDeleteKeys = None
+          SshGenKeyTypes = []
+          SshKeys = None
+          SshPublishHostKeys = None
+          SshQuietKeygen = None
           YumRepos = None
           UbuntuPro = None
           Users = []
@@ -346,6 +417,20 @@ type CloudConfig =
            PowerState = this.PowerState |> Option.defaultValue Unchecked.defaultof<PowerState>
            Runcmd = this.RunCmd |> Option.map (fun runCmd -> runCmd.Model) |> Option.toObj
            Snap = this.Snap |> Option.map (fun s -> s.Model) |> Option.defaultValue Unchecked.defaultof<_>
+           SshAuthorizedKeys = this.SshAuthorizedKeys |> Serialization.serializableSeq
+           ``ssh_deletekeys`` = this.SshDeleteKeys |> Option.toNullable
+           ``ssh_genkeytypes`` = this.SshGenKeyTypes |> Serialization.serializableSeq
+           DisableRoot = this.DisableRoot |> Option.toNullable
+           DisableRootOpts = this.DisableRootOpts |> Option.toObj
+           AllowPublicSshKeys = this.AllowPublicSshKeys |> Option.toNullable
+           SshQuietKeygen = this.SshQuietKeygen |> Option.toNullable
+           ``ssh_publish_hostkeys`` =
+            this.SshPublishHostKeys
+            |> Option.map (fun sshPublishHostKeys -> sshPublishHostKeys.Model)
+            |> Option.defaultValue Unchecked.defaultof<_>
+           NoSshFingerprints = this.NoSshFingerprints |> Option.toNullable
+           ``authkey_hash`` = this.AuthKeyHash |> Option.toObj
+           SshKeys = this.SshKeys |> Option.defaultValue Unchecked.defaultof<SshKeys>
            YumRepos = this.YumRepos |> Option.defaultValue Unchecked.defaultof<IDictionary<string, YumRepo>>
            UbuntuPro = this.UbuntuPro |> Option.map (fun u -> u.Model) |> Option.defaultValue Unchecked.defaultof<_>
            Users =

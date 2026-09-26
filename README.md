@@ -219,6 +219,77 @@ cloudConfig {
 |> Writer.write
 ```
 
+#### Configure SSH
+
+Use the top-level SSH-related cloud-init keys when you need to manage the
+default user's keys, host-key generation, root-login behavior, or fingerprint
+logging.
+
+```f#
+cloudConfig {
+    ssh_authorized_keys [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAEXAMPLE default@example"
+    ]
+    ssh_deletekeys true
+    ssh_genkeytypes [
+        SshKeyType.Rsa
+        SshKeyType.Ed25519
+    ]
+    disable_root true
+    disable_root_opts "no-port-forwarding,no-agent-forwarding,no-X11-forwarding,command=\"echo 'login as ubuntu';exit 142\""
+    allow_public_ssh_keys false
+    ssh_quiet_keygen true
+    ssh_publish_hostkeys (
+        sshPublishHostKeys {
+            enabled true
+            blacklist [ SshKeyType.Rsa ]
+        }
+    )
+    no_ssh_fingerprints true
+    authkey_hash "sha512"
+}
+|> Writer.write
+```
+
+This produces:
+
+```yaml
+#cloud-config
+allow_public_ssh_keys: false
+disable_root: true
+disable_root_opts: no-port-forwarding,no-agent-forwarding,no-X11-forwarding,command="echo 'login as ubuntu';exit 142"
+no_ssh_fingerprints: true
+ssh_authorized_keys:
+- ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAEXAMPLE default@example
+ssh_quiet_keygen: true
+authkey_hash: sha512
+ssh_deletekeys: true
+ssh_genkeytypes:
+- rsa
+- ed25519
+ssh_publish_hostkeys:
+  enabled: true
+  blacklist:
+  - rsa
+```
+
+To provide explicit host keys instead of having cloud-init generate them:
+
+```f#
+cloudConfig {
+    ssh_keys (
+        sshKeys {
+            ed25519_private "PRIVATE-ED25519"
+            ed25519_public "PUBLIC-ED25519"
+            rsa_private "PRIVATE-RSA"
+            rsa_public "PUBLIC-RSA"
+            rsa_certificate "CERT-RSA"
+        }
+    )
+}
+|> Writer.write
+```
+
 #### Write files
 
 Write some arbitrary data to a file. It will be base64 encoded automatically so there won't be any character escaping issues.

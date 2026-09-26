@@ -1,0 +1,17 @@
+#cloud-config
+allow_public_ssh_keys: false
+disable_root: true
+disable_root_opts: no-port-forwarding,no-agent-forwarding,no-X11-forwarding,command="echo 'login as ubuntu';exit 142"
+no_ssh_fingerprints: true
+ssh_authorized_keys:
+- ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAEXAMPLE default@example
+ssh_quiet_keygen: true
+authkey_hash: sha512
+ssh_deletekeys: true
+ssh_genkeytypes:
+- rsa
+- ed25519
+ssh_publish_hostkeys:
+  enabled: true
+  blacklist:
+  - rsa
